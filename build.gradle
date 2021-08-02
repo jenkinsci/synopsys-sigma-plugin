@@ -1,0 +1,40 @@
+plugins {
+    id 'org.jenkins-ci.jpi' version '0.43.0'
+}
+
+group = 'org.jenkins-ci.plugins'
+version = '0.0.1-SNAPSHOT'
+description = 'Allows users to run Sigma commands in their builds'
+
+jenkinsPlugin {
+    coreVersion = '2.263.1'
+    displayName = 'Synopsys Sigma Plugin'
+    //url = 'https://wiki.jenkins.io/display/JENKINS/Synopsys+Coverity+Plugin'
+    //gitHubUrl = 'https://github.com/jenkinsci/synopsys-coverity-plugin'
+
+    compatibleSinceVersion = '2.0.0'
+    pluginFirstClassLoader = false
+}
+
+dependencies {
+    implementation 'org.jenkins-ci.plugins:credentials:2.1.10'
+    implementation 'io.jenkins.plugins:warnings-ng:9.4.0'
+
+    //implementation 'org.jenkins-ci.plugins:job-dsl:1.67'
+    //implementation 'org.jenkins-ci.plugins.workflow:workflow-job:2.9'
+    //implementation 'org.jenkins-ci.plugins.workflow:workflow-cps:2.23'
+    //implementation 'org.jenkins-ci.plugins.workflow:workflow-step-api:2.10'
+}
+
+task renameFile {
+    doLast {
+        if (project.version.toString().contains("SNAPSHOT")) {
+            File libsDirectory = new File(project.buildDir, "libs")
+            File originalFile = new File(libsDirectory, "${project.getName()}.hpi")
+            File newFile = new File(libsDirectory, "${project.getName()}-${project.version}.hpi")
+            originalFile.renameTo newFile
+        }
+    }
+}
+
+jpi.finalizedBy renameFile

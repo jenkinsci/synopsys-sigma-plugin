@@ -1,0 +1,16 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:entry title="Sigma Tool">
+      <j:choose>
+        <j:when test="${descriptor.hasToolsConfigured()}">
+          <f:select id="sigmaToolNameId" field="sigmaToolName"/>
+        </j:when>
+        <j:otherwise>
+            <p>
+                A Sigma installation is missing from the Jenkins Global Tool Configuration.  Sigma analysis cannot be performed by this build step.
+                Please define a Sigma installation in the Jenkins Global Tool Configuration. Afterwards this build step can be configured properly.
+            </p>
+        </j:otherwise>
+      </j:choose>
+    </f:entry>
+</j:jelly>
