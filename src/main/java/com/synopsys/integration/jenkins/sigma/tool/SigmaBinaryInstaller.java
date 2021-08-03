@@ -50,7 +50,9 @@ public class SigmaBinaryInstaller extends DownloadFromUrlInstaller {
             logger.info("Installing Sigma on Node {}.", node.getDisplayName());
             logger.info("Downloading Sigma binary from {}.", downloadUrl);
             installLocation.mkdirs();
-            virtualChannel.call(new FileDownloader(downloadUrl, installLocation.child("sigma"), timeout));
+            // timeout is in seconds convert to milliseconds.
+            int timeoutInMilliseconds = timeout * 1000;
+            virtualChannel.call(new FileDownloader(downloadUrl, installLocation.child("sigma"), timeoutInMilliseconds));
         } catch (IOException | InterruptedException ex) {
             logger.info("Failed to install Sigma on Node {} cause.", node.getDisplayName(), ex.getMessage());
             String errorMessage = String.format("Failed to install Sigma on Node %s.", node.getDisplayName());
