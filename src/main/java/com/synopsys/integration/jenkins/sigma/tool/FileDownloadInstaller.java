@@ -15,7 +15,7 @@ import hudson.ProxyConfiguration;
 import hudson.model.TaskListener;
 import jenkins.security.MasterToSlaveCallable;
 
-public class FileDownloader extends MasterToSlaveCallable<Void, IOException> {
+public class FileDownloadInstaller extends MasterToSlaveCallable<Void, IOException> {
     private static final String LOG_PREFIX = "Sigma installation: ";
     private static final String INSTALLED_FROM_FILE_NAME = ".installedFrom";
     private static final String TIMESTAMP_FILE_NAME = ".timestamp";
@@ -25,7 +25,7 @@ public class FileDownloader extends MasterToSlaveCallable<Void, IOException> {
     private final int timeout;
     private final TaskListener log;
 
-    public FileDownloader(final String downloadUrl, final FilePath downloadLocation, final int timeout, final TaskListener log) {
+    public FileDownloadInstaller(final String downloadUrl, final FilePath downloadLocation, final int timeout, final TaskListener log) {
         this.downloadUrl = downloadUrl;
         this.downloadLocation = downloadLocation;
         this.timeout = timeout;

@@ -46,7 +46,7 @@ public class SigmaToolInstallation extends ToolInstallation implements Environme
 
         @Override
         public List<? extends ToolInstaller> getDefaultInstallers() {
-            return Collections.singletonList(new SigmaBinaryInstaller(null, null, SigmaBinaryInstaller.DEFAULT_TIMEOUT));
+            return Collections.singletonList(new SigmaBinaryInstaller(null, null, SigmaBinaryInstaller.DEFAULT_TIMEOUT_SECONDS));
         }
 
         @Override

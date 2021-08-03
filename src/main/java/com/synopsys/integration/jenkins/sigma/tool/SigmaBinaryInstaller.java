@@ -3,8 +3,6 @@ package com.synopsys.integration.jenkins.sigma.tool;
 import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import hudson.AbortException;
 import hudson.Extension;
@@ -17,8 +15,7 @@ import hudson.tools.ToolInstallation;
 import hudson.tools.ToolInstallerDescriptor;
 
 public class SigmaBinaryInstaller extends DownloadFromUrlInstaller {
-    public static final int DEFAULT_TIMEOUT = 30000;
-    private static final Logger logger = LoggerFactory.getLogger(SigmaBinaryInstaller.class);
+    public static final int DEFAULT_TIMEOUT_SECONDS = 30;
     private final String downloadUrl;
     private final int timeout;
 
@@ -47,14 +44,11 @@ public class SigmaBinaryInstaller extends DownloadFromUrlInstaller {
             if (virtualChannel == null) {
                 throw new AbortException("Configured node \"" + node.getDisplayName() + "\" is either not connected or offline.  Cannot install Sigma.");
             }
-            logger.info("Installing Sigma on Node {}.", node.getDisplayName());
-            logger.info("Downloading Sigma binary from {}.", downloadUrl);
-            installLocation.mkdirs();
             // timeout is in seconds convert to milliseconds.
             int timeoutInMilliseconds = timeout * 1000;
-            virtualChannel.call(new FileDownloader(downloadUrl, installLocation.child("sigma"), timeoutInMilliseconds));
+            virtualChannel.call(new FileDownloadInstaller(downloadUrl, installLocation, timeoutInMilliseconds, log));
         } catch (IOException | InterruptedException ex) {
-            logger.info("Failed to install Sigma on Node {} cause.", node.getDisplayName(), ex.getMessage());
+            ex.printStackTrace(log.error("Failed to install Sigma on Node %s cause.", node.getDisplayName()));
             String errorMessage = String.format("Failed to install Sigma on Node %s.", node.getDisplayName());
             //TODO should this be a runtime exception or our own exception wrapper.
             throw new RuntimeException(errorMessage, ex);
