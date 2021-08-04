@@ -1,5 +1,6 @@
 package com.synopsys.integration.jenkins.sigma.tool;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
@@ -11,6 +12,8 @@ import com.synopsys.integration.jenkins.sigma.workflow.SigmaBinaryStep;
 
 import hudson.EnvVars;
 import hudson.Extension;
+import hudson.Functions;
+import hudson.Launcher;
 import hudson.model.EnvironmentSpecific;
 import hudson.model.Node;
 import hudson.model.TaskListener;
@@ -20,8 +23,11 @@ import hudson.tools.ToolInstallation;
 import hudson.tools.ToolInstaller;
 import hudson.tools.ToolProperty;
 import jenkins.model.Jenkins;
+import jenkins.security.MasterToSlaveCallable;
 
 public class SigmaToolInstallation extends ToolInstallation implements EnvironmentSpecific<SigmaToolInstallation>, NodeSpecific<SigmaToolInstallation>, Serializable {
+    public static final String UNIX_SIGMA_COMMAND = "sigma";
+    public static final String WINDOWS_SIGMA_COMMAND = "sigma.exe";
 
     @DataBoundConstructor
     public SigmaToolInstallation(final String name, final String home, final List<? extends ToolProperty<?>> properties) {
@@ -34,6 +40,28 @@ public class SigmaToolInstallation extends ToolInstallation implements Environme
 
     public SigmaToolInstallation forNode(Node node, TaskListener log) throws IOException, InterruptedException {
         return new SigmaToolInstallation(getName(), translateFor(node, log), getProperties().toList());
+    }
+
+    public String getExecutablePath(Launcher launcher) throws IOException, InterruptedException {
+        return launcher.getChannel().call(new GetExecutablePath(getHome()));
+    }
+
+    private static final class GetExecutablePath extends MasterToSlaveCallable<String, IOException> {
+        private final String sigmaHome;
+
+        public GetExecutablePath(String sigmaHome) {
+            this.sigmaHome = sigmaHome;
+        }
+
+        @Override
+        public String call() throws IOException {
+            String execName = (Functions.isWindows()) ? WINDOWS_SIGMA_COMMAND : UNIX_SIGMA_COMMAND;
+            File exe = new File(sigmaHome, execName);
+            if (exe.exists()) {
+                return exe.getPath();
+            }
+            return null;
+        }
     }
 
     @Extension

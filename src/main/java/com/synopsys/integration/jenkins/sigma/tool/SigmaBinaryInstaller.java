@@ -66,5 +66,7 @@ public class SigmaBinaryInstaller extends DownloadFromUrlInstaller {
         public boolean isApplicable(Class<? extends ToolInstallation> toolType) {
             return toolType == SigmaToolInstallation.class;
         }
+
+        //TODO add validator for download URL.
     }
 }
