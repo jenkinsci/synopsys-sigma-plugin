@@ -42,9 +42,8 @@ public class SigmaBinaryStep extends Builder {
 
     private final String sigmaToolName;
     private boolean ignorePolicies;
-    private String additionalAnalyzeArguments;
+    private List<AnalyzeArgumentEntry> additionalAnalyzeArguments;
     private String workingDirectory;
-    private String additionalCommandLineOptions;
     private List<ConfigFileEntry> configFileEntries;
     private List<PolicyFileEntry> policyFileEntries;
     private List<AnalyzeDirectoryEntry> analyzeDirectories;
@@ -60,25 +59,14 @@ public class SigmaBinaryStep extends Builder {
     }
 
     @SuppressWarnings("unused")
-    public String getAdditionalAnalyzeArguments() {
+    public List<AnalyzeArgumentEntry> getAdditionalAnalyzeArguments() {
         return additionalAnalyzeArguments;
     }
 
     @SuppressWarnings("unused")
     @DataBoundSetter
-    public void setAdditionalAnalyzeArguments(final String additionalAnalyzeArguments) {
-        this.additionalAnalyzeArguments = additionalAnalyzeArguments;
-    }
-
-    @SuppressWarnings("unused")
-    public String getWorkingDirectory() {
-        return workingDirectory;
-    }
-
-    @SuppressWarnings("unused")
-    @DataBoundSetter
-    public void setWorkingDirectory(final String workingDirectory) {
-        this.workingDirectory = workingDirectory;
+    public void setAdditionalAnalyzeArguments(final List<AnalyzeArgumentEntry> additionalAnalyzeArguments) {
+        this.additionalAnalyzeArguments = initEntryList(additionalAnalyzeArguments);
     }
 
     @SuppressWarnings("unused")
@@ -140,8 +128,21 @@ public class SigmaBinaryStep extends Builder {
             }
 
             ArgumentListBuilder commandLineBuilder = new ArgumentListBuilder();
+            // order of the arguments matters:
+            // 1. executable
+            // 2. config files
+            // 3. policy files
+            // 4. working directory
+            // 5. analyze sub-command
+            // 6. format jenkins
+            // 7. additional arguments
+            // 8. directories to analyze (always the last argument)
             commandLineBuilder = addSigmaExecutableToCommand(sigmaBuildContext, commandLineBuilder);
-            commandLineBuilder = addCommandLineArguments(commandLineBuilder);
+            commandLineBuilder = addCommandLineArguments(commandLineBuilder, configFileEntries);
+            commandLineBuilder = addCommandLineArguments(commandLineBuilder, policyFileEntries);
+            commandLineBuilder = addCommandLineArguments(commandLineBuilder, CommonCommandLineEntry.toAppendableList());
+            commandLineBuilder = addCommandLineArguments(commandLineBuilder, additionalAnalyzeArguments);
+            commandLineBuilder = addCommandLineArguments(commandLineBuilder, analyzeDirectories);
             FilePath workingDirectory = getWorkingDirectory(build, sigmaBuildContext);
             Result result = executeSigma(sigmaBuildContext, commandLineBuilder, workingDirectory);
             if (result == Result.SUCCESS) {
@@ -207,14 +208,13 @@ public class SigmaBinaryStep extends Builder {
         return commandLineBuilder;
     }
 
-    private ArgumentListBuilder addCommandLineArguments(ArgumentListBuilder commandLineBuilder) {
-        //TODO: Add command line arguments before analyze i.e. policy files.
-        // add common arguments like analyze and --format jenkins
-        commandLineBuilder.add("analyze");
-        commandLineBuilder.add("--format");
-        commandLineBuilder.add("jenkins");
-        //TODO add additional analysis command line arguments...
-        return commandLineBuilder;
+    private <T extends AppendableArgument> ArgumentListBuilder addCommandLineArguments(ArgumentListBuilder argumentListBuilder, List<T> argumentListItems) {
+        if (argumentListItems != null) {
+            for (AppendableArgument appendableArgument : argumentListItems) {
+                appendableArgument.appendToArgumentList(argumentListBuilder);
+            }
+        }
+        return argumentListBuilder;
     }
 
     private Result executeSigma(SigmaBuildContext sigmaBuildContext, ArgumentListBuilder commandLineBuilder, FilePath workingDirectory) throws IOException, InterruptedException {

@@ -1,12 +1,14 @@
 package com.synopsys.integration.jenkins.sigma.workflow;
 
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
+import hudson.util.ArgumentListBuilder;
 
-public class ConfigFileEntry extends AbstractDescribableImpl<ConfigFileEntry> {
+public class ConfigFileEntry extends AbstractDescribableImpl<ConfigFileEntry> implements AppendableArgument {
     private String configFilePath;
 
     @DataBoundConstructor
@@ -19,11 +21,19 @@ public class ConfigFileEntry extends AbstractDescribableImpl<ConfigFileEntry> {
         return configFilePath;
     }
 
+    @Override
+    public void appendToArgumentList(ArgumentListBuilder argumentListBuilder) {
+        if (StringUtils.isNotBlank(configFilePath)) {
+            argumentListBuilder.add("--config");
+            argumentListBuilder.add(configFilePath.trim());
+        }
+    }
+
     @Extension
     public static class DescriptorImpl extends Descriptor<ConfigFileEntry> {
         @Override
         public String getDisplayName() {
-            return "Config File Path";
+            return "Configuration File Path";
         }
     }
 }

@@ -14,12 +14,6 @@
       </j:choose>
     </f:entry>
     <f:advanced>
-        <f:entry title="Working Directory" field="workingDirectory">
-            <f:textbox/>
-        </f:entry>
-        <f:entry title="Additional Analyze Options" field="additionalAnalyzeArguments">
-            <f:textbox/>
-        </f:entry>
         <f:section title="Configuration Files">
             <f:block>
                 <f:repeatableHeteroProperty field="configFileEntries" hasHeader="true"/>
@@ -28,6 +22,11 @@
         <f:section title="Policy Files">
             <f:block>
                 <f:repeatableHeteroProperty field="policyFileEntries" hasHeader="true"/>
+            </f:block>
+        </f:section>
+        <f:section title="Additional Arguments">
+            <f:block>
+                <f:repeatableHeteroProperty field="additionalAnalyzeArguments" hasHeader="true"/>
             </f:block>
         </f:section>
         <f:section title="Analysis Directories">

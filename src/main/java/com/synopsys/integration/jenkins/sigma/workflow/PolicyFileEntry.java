@@ -1,12 +1,14 @@
 package com.synopsys.integration.jenkins.sigma.workflow;
 
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
+import hudson.util.ArgumentListBuilder;
 
-public class PolicyFileEntry extends AbstractDescribableImpl<PolicyFileEntry> {
+public class PolicyFileEntry extends AbstractDescribableImpl<PolicyFileEntry> implements AppendableArgument {
     private String policyFilePath;
 
     @DataBoundConstructor
@@ -17,6 +19,14 @@ public class PolicyFileEntry extends AbstractDescribableImpl<PolicyFileEntry> {
     @SuppressWarnings("unused")
     public String getPolicyFilePath() {
         return policyFilePath;
+    }
+
+    @Override
+    public void appendToArgumentList(ArgumentListBuilder argumentListBuilder) {
+        if (StringUtils.isNotBlank(policyFilePath)) {
+            argumentListBuilder.add("--policy");
+            argumentListBuilder.add(policyFilePath.trim());
+        }
     }
 
     @Extension

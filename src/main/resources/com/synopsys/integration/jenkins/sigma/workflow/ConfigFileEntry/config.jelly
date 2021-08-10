@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
-    <f:entry field="configFilePath" title="Configuration File">
+    <f:entry field="configFilePath" title="File Path">
         <f:textbox/>
     </f:entry>
 </j:jelly>
