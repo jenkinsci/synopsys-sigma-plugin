@@ -68,5 +68,6 @@ public class SigmaBinaryInstaller extends DownloadFromUrlInstaller {
         }
 
         //TODO add validator for download URL.
+        //TODO add credentials ID in case the URL is to synopsys community.
     }
 }

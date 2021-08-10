@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import com.synopsys.integration.jenkins.sigma.workflow.SigmaBinaryStep;
@@ -65,6 +66,7 @@ public class SigmaToolInstallation extends ToolInstallation implements Environme
     }
 
     @Extension
+    @Symbol("sigma")
     public static final class DescriptorImpl extends ToolDescriptor<SigmaToolInstallation> {
 
         @Override

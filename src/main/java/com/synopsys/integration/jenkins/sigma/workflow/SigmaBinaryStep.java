@@ -1,13 +1,18 @@
 package com.synopsys.integration.jenkins.sigma.workflow;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +41,13 @@ public class SigmaBinaryStep extends Builder {
     private static final Logger logger = LoggerFactory.getLogger(SigmaBinaryStep.class);
 
     private final String sigmaToolName;
+    private boolean ignorePolicies;
+    private String additionalAnalyzeArguments;
+    private String workingDirectory;
+    private String additionalCommandLineOptions;
+    private List<ConfigFileEntry> configFileEntries;
+    private List<PolicyFileEntry> policyFileEntries;
+    private List<AnalyzeDirectoryEntry> analyzeDirectories;
 
     @DataBoundConstructor
     public SigmaBinaryStep(final String sigmaToolName) {
@@ -45,6 +57,65 @@ public class SigmaBinaryStep extends Builder {
     @SuppressWarnings("unused")
     public String getSigmaToolName() {
         return sigmaToolName;
+    }
+
+    @SuppressWarnings("unused")
+    public String getAdditionalAnalyzeArguments() {
+        return additionalAnalyzeArguments;
+    }
+
+    @SuppressWarnings("unused")
+    @DataBoundSetter
+    public void setAdditionalAnalyzeArguments(final String additionalAnalyzeArguments) {
+        this.additionalAnalyzeArguments = additionalAnalyzeArguments;
+    }
+
+    @SuppressWarnings("unused")
+    public String getWorkingDirectory() {
+        return workingDirectory;
+    }
+
+    @SuppressWarnings("unused")
+    @DataBoundSetter
+    public void setWorkingDirectory(final String workingDirectory) {
+        this.workingDirectory = workingDirectory;
+    }
+
+    @SuppressWarnings("unused")
+    public List<ConfigFileEntry> getConfigFileEntries() {
+        return configFileEntries;
+    }
+
+    @SuppressWarnings("unused")
+    @DataBoundSetter
+    public void setConfigFileEntries(final List<ConfigFileEntry> configFileEntries) {
+        this.configFileEntries = initEntryList(configFileEntries);
+    }
+
+    @SuppressWarnings("unused")
+    public List<PolicyFileEntry> getPolicyFileEntries() {
+        return policyFileEntries;
+    }
+
+    @SuppressWarnings("unused")
+    @DataBoundSetter
+    public void setPolicyFileEntries(final List<PolicyFileEntry> policyFileEntries) {
+        this.policyFileEntries = initEntryList(policyFileEntries);
+    }
+
+    @SuppressWarnings("unused")
+    public List<AnalyzeDirectoryEntry> getAnalyzeDirectories() {
+        return analyzeDirectories;
+    }
+
+    @SuppressWarnings("unused")
+    @DataBoundSetter
+    public void setAnalyzeDirectories(final List<AnalyzeDirectoryEntry> analyzeDirectories) {
+        this.analyzeDirectories = initEntryList(analyzeDirectories);
+    }
+
+    private <T> List<T> initEntryList(List<T> entries) {
+        return entries == null ? Collections.emptyList() : new ArrayList<>(entries);
     }
 
     @Override
@@ -171,6 +242,7 @@ public class SigmaBinaryStep extends Builder {
     }
 
     @Extension
+    @Symbol("sigma")
     public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
         @CopyOnWrite
         private volatile SigmaToolInstallation[] installations = new SigmaToolInstallation[0];
