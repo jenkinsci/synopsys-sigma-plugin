@@ -3,6 +3,8 @@ package com.synopsys.integration.jenkins.sigma.workflow;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import com.synopsys.integration.jenkins.sigma.Messages;
+
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -32,7 +34,7 @@ public class AnalyzeDirectoryEntry extends AbstractDescribableImpl<AnalyzeDirect
     public static class DescriptorImpl extends Descriptor<AnalyzeDirectoryEntry> {
         @Override
         public String getDisplayName() {
-            return "Analyze Sub-Directory";
+            return Messages.workflow_analyze_directory_displayName();
         }
     }
 }

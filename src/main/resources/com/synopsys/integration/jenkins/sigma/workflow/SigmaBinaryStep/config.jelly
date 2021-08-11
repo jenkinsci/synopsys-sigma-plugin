@@ -1,35 +1,34 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <f:entry title="Sigma Tool">
+    <f:entry title="${%sigmaTool}">
       <j:choose>
         <j:when test="${descriptor.hasToolsConfigured()}">
           <f:select id="sigmaToolNameId" field="sigmaToolName"/>
         </j:when>
         <j:otherwise>
             <p>
-                A Sigma installation is missing from the Jenkins Global Tool Configuration.  Sigma analysis cannot be performed by this build step.
-                Please define a Sigma installation in the Jenkins Global Tool Configuration. Afterwards this build step can be configured properly.
+                ${%missingToolText}
             </p>
         </j:otherwise>
       </j:choose>
     </f:entry>
     <f:advanced>
-        <f:section title="Configuration Files">
+        <f:section title="${%sectionHeadingConfig}">
             <f:block>
                 <f:repeatableHeteroProperty field="configFileEntries" hasHeader="true"/>
             </f:block>
         </f:section>
-        <f:section title="Policy Files">
+        <f:section title="${%sectionHeadingPolicy}">
             <f:block>
                 <f:repeatableHeteroProperty field="policyFileEntries" hasHeader="true"/>
             </f:block>
         </f:section>
-        <f:section title="Additional Arguments">
+        <f:section title="${%sectionHeadingAdditionalArguments}">
             <f:block>
                 <f:repeatableHeteroProperty field="additionalAnalyzeArguments" hasHeader="true"/>
             </f:block>
         </f:section>
-        <f:section title="Analysis Directories">
+        <f:section title="${%sectionHeadingDirectories}">
             <f:block>
                 <f:repeatableHeteroProperty field="analyzeDirectories" hasHeader="true"/>
             </f:block>

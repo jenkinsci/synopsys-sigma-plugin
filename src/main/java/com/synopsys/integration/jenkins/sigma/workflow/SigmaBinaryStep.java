@@ -16,6 +16,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.synopsys.integration.jenkins.sigma.Messages;
 import com.synopsys.integration.jenkins.sigma.tool.SigmaToolInstallation;
 
 import hudson.AbortException;
@@ -155,7 +156,7 @@ public class SigmaBinaryStep extends Builder {
         } catch (final Exception ex) {
             logger.error("[ERROR] " + ex.getMessage());
             logger.debug(ex.getMessage(), ex);
-            ex.printStackTrace(listener.fatalError(FAILURE_MESSAGE + "sigma command execution failed"));
+            ex.printStackTrace(listener.fatalError(FAILURE_MESSAGE + "sigma command execution failed."));
             build.setResult(Result.UNSTABLE);
         }
         return false;
@@ -258,7 +259,7 @@ public class SigmaBinaryStep extends Builder {
         @Override
         @Nonnull
         public String getDisplayName() {
-            return "Execute Synopsys Sigma static analysis with Binary";
+            return Messages.workflow_step_displayName();
         }
 
         @Override

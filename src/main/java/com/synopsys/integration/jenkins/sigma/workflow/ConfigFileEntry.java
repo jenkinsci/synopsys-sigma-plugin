@@ -3,6 +3,8 @@ package com.synopsys.integration.jenkins.sigma.workflow;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import com.synopsys.integration.jenkins.sigma.Messages;
+
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -33,7 +35,7 @@ public class ConfigFileEntry extends AbstractDescribableImpl<ConfigFileEntry> im
     public static class DescriptorImpl extends Descriptor<ConfigFileEntry> {
         @Override
         public String getDisplayName() {
-            return "Configuration File Path";
+            return Messages.workflow_config_entry_displayName();
         }
     }
 }

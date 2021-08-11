@@ -3,6 +3,8 @@ package com.synopsys.integration.jenkins.sigma.workflow;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import com.synopsys.integration.jenkins.sigma.Messages;
+
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -42,7 +44,7 @@ public class AnalyzeArgumentEntry extends AbstractDescribableImpl<AnalyzeArgumen
     public static class DescriptorImpl extends Descriptor<AnalyzeArgumentEntry> {
         @Override
         public String getDisplayName() {
-            return "Analyze Argument";
+            return Messages.workflow_analyze_argument_displayName();
         }
     }
 }

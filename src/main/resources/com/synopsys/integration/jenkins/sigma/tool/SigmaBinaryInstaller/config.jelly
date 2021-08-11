@@ -3,10 +3,10 @@
   Config page
 -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <f:entry title="Sigma Binary Download URL" field="downloadUrl">
+    <f:entry title="${%downloadUrlTitle}" field="downloadUrl">
         <f:textbox />
     </f:entry>
-    <f:entry title="Connection Timeout" field="timeout" >
+    <f:entry title="${%connectionTimeoutTitle}" field="timeout" >
         <!-- minimum 10 seconds to an hour in seconds -->
         <f:number  min="10" max="3600" default="30"/>
     </f:entry>
