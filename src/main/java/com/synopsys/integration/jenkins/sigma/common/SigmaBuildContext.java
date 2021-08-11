@@ -1,4 +1,4 @@
-package com.synopsys.integration.jenkins.sigma.workflow;
+package com.synopsys.integration.jenkins.sigma.common;
 
 import java.util.Optional;
 

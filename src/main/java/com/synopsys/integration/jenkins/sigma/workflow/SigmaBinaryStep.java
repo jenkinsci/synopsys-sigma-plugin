@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -17,6 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.synopsys.integration.jenkins.sigma.Messages;
+import com.synopsys.integration.jenkins.sigma.common.CommandArgumentHelper;
+import com.synopsys.integration.jenkins.sigma.common.SigmaBuildContext;
+import com.synopsys.integration.jenkins.sigma.common.ValidationResult;
 import com.synopsys.integration.jenkins.sigma.tool.SigmaToolInstallation;
 
 import hudson.AbortException;
@@ -42,9 +46,7 @@ public class SigmaBinaryStep extends Builder {
     private static final Logger logger = LoggerFactory.getLogger(SigmaBinaryStep.class);
 
     private final String sigmaToolName;
-    private boolean ignorePolicies;
     private List<AnalyzeArgumentEntry> additionalAnalyzeArguments;
-    private String workingDirectory;
     private List<ConfigFileEntry> configFileEntries;
     private List<PolicyFileEntry> policyFileEntries;
     private List<AnalyzeDirectoryEntry> analyzeDirectories;
@@ -138,13 +140,15 @@ public class SigmaBinaryStep extends Builder {
             // 6. format jenkins
             // 7. additional arguments
             // 8. directories to analyze (always the last argument)
-            commandLineBuilder = addSigmaExecutableToCommand(sigmaBuildContext, commandLineBuilder);
-            commandLineBuilder = addCommandLineArguments(commandLineBuilder, configFileEntries);
-            commandLineBuilder = addCommandLineArguments(commandLineBuilder, policyFileEntries);
-            commandLineBuilder = addCommandLineArguments(commandLineBuilder, CommonCommandLineEntry.toAppendableList());
-            commandLineBuilder = addCommandLineArguments(commandLineBuilder, additionalAnalyzeArguments);
-            commandLineBuilder = addCommandLineArguments(commandLineBuilder, analyzeDirectories);
             FilePath workingDirectory = getWorkingDirectory(build, sigmaBuildContext);
+            commandLineBuilder = addSigmaExecutableToCommand(sigmaBuildContext, commandLineBuilder);
+            List<ValidationResult> commandLineValidationErrors = new LinkedList<>();
+            commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, configFileEntries);
+            commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, policyFileEntries);
+            commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, CommonCommandLineEntry.toAppendableList());
+            commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, additionalAnalyzeArguments);
+            commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, analyzeDirectories);
+
             Result result = executeSigma(sigmaBuildContext, commandLineBuilder, workingDirectory);
             if (result == Result.SUCCESS) {
                 return true;
@@ -209,19 +213,16 @@ public class SigmaBinaryStep extends Builder {
         return commandLineBuilder;
     }
 
-    private <T extends AppendableArgument> ArgumentListBuilder addCommandLineArguments(ArgumentListBuilder argumentListBuilder, List<T> argumentListItems) {
-        if (argumentListItems != null) {
-            for (AppendableArgument appendableArgument : argumentListItems) {
-                appendableArgument.appendToArgumentList(argumentListBuilder);
-            }
-        }
-        return argumentListBuilder;
-    }
-
     private Result executeSigma(SigmaBuildContext sigmaBuildContext, ArgumentListBuilder commandLineBuilder, FilePath workingDirectory) throws IOException, InterruptedException {
+        ArgumentListBuilder commands = commandLineBuilder;
+        if (!sigmaBuildContext.getLauncher().isUnix()) {
+            // convert to a windows command line
+            commands = commandLineBuilder.toWindowsCommand();
+        }
+
         int returnCode = sigmaBuildContext.getLauncher()
             .launch()
-            .cmds(commandLineBuilder)
+            .cmds(commands)
             .envs(sigmaBuildContext.getEnvironment())
             .pwd(workingDirectory)
             .join();

@@ -4,6 +4,8 @@ import javax.annotation.Nonnull;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import com.synopsys.integration.jenkins.sigma.Messages;
+
 import edu.hm.hafner.analysis.parser.JsonParser;
 import hudson.Extension;
 import io.jenkins.plugins.analysis.core.model.ReportScanningTool;
@@ -11,7 +13,6 @@ import io.jenkins.plugins.analysis.core.model.ReportScanningTool;
 public class SigmaTool extends ReportScanningTool {
     private static final String TOOL_ID = "synopsys-sigma-issues-tool";
     private static final String DEFAULT_FILE_PATTERN = "**/sigma-results.json";
-    private static final String TOOL_DISPLAY_NAME = "Synopsys Sigma";
 
     @DataBoundConstructor
     public SigmaTool() {
@@ -35,7 +36,7 @@ public class SigmaTool extends ReportScanningTool {
         @Nonnull
         @Override
         public String getDisplayName() {
-            return TOOL_DISPLAY_NAME;
+            return Messages.issues_reporting_tool_displayName();
         }
 
         @Override
