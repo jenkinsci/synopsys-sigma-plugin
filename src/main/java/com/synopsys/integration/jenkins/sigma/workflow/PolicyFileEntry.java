@@ -10,8 +10,8 @@ import org.kohsuke.stapler.QueryParameter;
 
 import com.synopsys.integration.jenkins.sigma.Messages;
 import com.synopsys.integration.jenkins.sigma.common.AppendableArgument;
-import com.synopsys.integration.jenkins.sigma.common.CommandArgumentHelper;
 import com.synopsys.integration.jenkins.sigma.common.SigmaBuildContext;
+import com.synopsys.integration.jenkins.sigma.common.ValidationHelper;
 import com.synopsys.integration.jenkins.sigma.common.ValidationResult;
 
 import hudson.Extension;
@@ -44,7 +44,11 @@ public class PolicyFileEntry extends AbstractDescribableImpl<PolicyFileEntry> im
 
     @Override
     public ValidationResult validateArgument(final SigmaBuildContext buildContext, final FilePath workingDirectory) {
-        return ValidationResult.success("--policy", policyFilePath);
+        boolean empty = ValidationHelper.isFormFieldEmpty(getPolicyFilePath());
+        if (empty) {
+            return ValidationResult.error("--policy", getPolicyFilePath(), "File path cannot be empty");
+        }
+        return ValidationResult.success("--policy", getPolicyFilePath());
     }
 
     @Extension
@@ -56,7 +60,11 @@ public class PolicyFileEntry extends AbstractDescribableImpl<PolicyFileEntry> im
 
         @SuppressWarnings("unused")
         public FormValidation doCheckPolicyFilePath(@QueryParameter String value) throws IOException, ServletException {
-            return CommandArgumentHelper.isFormFieldEmpty(value);
+            boolean empty = ValidationHelper.isFormFieldEmpty(value);
+            if (empty) {
+                return FormValidation.error(Messages.build_commandline_empty_field());
+            }
+            return FormValidation.ok();
         }
     }
 }

@@ -2,7 +2,7 @@ package com.synopsys.integration.jenkins.sigma.common;
 
 import java.util.Optional;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class ValidationResult {
     private final String name;
@@ -15,24 +15,36 @@ public class ValidationResult {
         this.errorMessage = errorMessage;
     }
 
-    public static ValidationResult success(@Nonnull String name, @Nonnull String value) {
+    public static ValidationResult success(String name, @Nullable String value) {
         return new ValidationResult(name, value, null);
     }
 
-    public static ValidationResult error(@Nonnull String name, @Nonnull String value, @Nonnull String errorMessage) {
+    public static ValidationResult success(String name) {
+        return new ValidationResult(name, null, null);
+    }
+
+    public static ValidationResult error(String name, @Nullable String value, @Nullable String errorMessage) {
         return new ValidationResult(name, value, errorMessage);
+    }
+
+    public static ValidationResult error(String name, @Nullable String errorMessage) {
+        return new ValidationResult(name, null, errorMessage);
     }
 
     public boolean isError() {
         return getErrorMessage().isPresent();
     }
 
+    public boolean hasValue() {
+        return getValue().isPresent();
+    }
+
     public String getName() {
         return name;
     }
 
-    public String getValue() {
-        return value;
+    public Optional<String> getValue() {
+        return Optional.ofNullable(value);
     }
 
     public Optional<String> getErrorMessage() {

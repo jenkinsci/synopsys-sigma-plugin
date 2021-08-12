@@ -4,13 +4,12 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 import com.synopsys.integration.jenkins.sigma.Messages;
-import com.synopsys.integration.jenkins.sigma.common.CommandArgumentHelper;
 import com.synopsys.integration.jenkins.sigma.common.SigmaBuildContext;
+import com.synopsys.integration.jenkins.sigma.common.ValidationHelper;
 import com.synopsys.integration.jenkins.sigma.common.ValidationResult;
 
 import hudson.Extension;
@@ -34,19 +33,20 @@ public class AnalyzeFlagArgumentEntry extends AnalyzeArgumentEntry {
 
     @Override
     public void appendToArgumentList(final ArgumentListBuilder argumentListBuilder) {
-        // TODO may not need to test if the validate is called first.
-        if (StringUtils.isNotBlank(name)) {
-            if (getName().trim().startsWith("--")) {
-                argumentListBuilder.add(getName().trim());
-            } else {
-                argumentListBuilder.add(String.format("--%s", getName().trim()));
-            }
+        if (getName().trim().startsWith("--")) {
+            argumentListBuilder.add(getName().trim());
+        } else {
+            argumentListBuilder.add(String.format("--%s", getName().trim()));
         }
     }
 
     @Override
     public ValidationResult validateArgument(final SigmaBuildContext buildContext, final FilePath workingDirectory) {
-        return ValidationResult.success(getName(), "");
+        boolean nameValid = ValidationHelper.isNameValid(getName());
+        if (!nameValid) {
+            return ValidationResult.error(getName(), "Argument name is invalid. It is a reserved argument name.");
+        }
+        return ValidationResult.success(getName());
     }
 
     @Extension
@@ -58,7 +58,15 @@ public class AnalyzeFlagArgumentEntry extends AnalyzeArgumentEntry {
 
         @SuppressWarnings("unused")
         public FormValidation doCheckName(@QueryParameter String value) throws IOException, ServletException {
-            return CommandArgumentHelper.isFormFieldEmpty(value);
+            boolean empty = ValidationHelper.isFormFieldEmpty(value);
+            if (empty) {
+                return FormValidation.error(Messages.build_commandline_empty_field());
+            }
+
+            if (!ValidationHelper.isNameValid(value)) {
+                return FormValidation.error(Messages.build_commandline_reserved_name());
+            }
+            return FormValidation.ok();
         }
     }
 }

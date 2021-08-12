@@ -10,8 +10,8 @@ import org.kohsuke.stapler.QueryParameter;
 
 import com.synopsys.integration.jenkins.sigma.Messages;
 import com.synopsys.integration.jenkins.sigma.common.AppendableArgument;
-import com.synopsys.integration.jenkins.sigma.common.CommandArgumentHelper;
 import com.synopsys.integration.jenkins.sigma.common.SigmaBuildContext;
+import com.synopsys.integration.jenkins.sigma.common.ValidationHelper;
 import com.synopsys.integration.jenkins.sigma.common.ValidationResult;
 
 import hudson.Extension;
@@ -43,20 +43,38 @@ public class AnalyzeDirectoryEntry extends AbstractDescribableImpl<AnalyzeDirect
 
     @Override
     public ValidationResult validateArgument(final SigmaBuildContext buildContext, final FilePath workingDirectory) {
+        String path = getSubDirectoryPath();
+        String fieldName = "analyze directory";
         try {
-            FormValidation subDirectoryDefined = CommandArgumentHelper.isFormFieldEmpty(getSubDirectoryPath());
-            FormValidation relativePath = CommandArgumentHelper.isRelativeFilePath(workingDirectory, getSubDirectoryPath());
-            if (subDirectoryDefined.kind == FormValidation.Kind.ERROR) {
-                return ValidationResult.error("analyze directory", getSubDirectoryPath(), "sub-directory cannot be empty.");
+            boolean subDirectoryEmpty = ValidationHelper.isFormFieldEmpty(path);
+            FormValidation relativePath = isRelativeFilePath(workingDirectory, path);
+
+            if (subDirectoryEmpty) {
+                return ValidationResult.error(fieldName, path, "The file path cannot be empty.");
             }
 
             if (relativePath.kind == FormValidation.Kind.ERROR) {
-                return ValidationResult.error("analyze directory", getSubDirectoryPath(), "sub-directory isn't a relative path with respect to the workspace.");
+                return ValidationResult.error(fieldName, path, "The file path isn't a relative path with respect to the workspace.");
             }
-        } catch (IOException ex) {
-            return ValidationResult.error("analyze directory", getSubDirectoryPath(), ex.getMessage());
+
+            boolean exists = doesFileExist(workingDirectory, path);
+            if (!exists) {
+                return ValidationResult.error(fieldName, path, "The file path does not exist in the workspace.");
+            }
+
+        } catch (IOException | InterruptedException ex) {
+            return ValidationResult.error(fieldName, path, ex.getMessage());
         }
-        return ValidationResult.success("analyze directory", getSubDirectoryPath());
+        return ValidationResult.success(fieldName, path);
+    }
+
+    private FormValidation isRelativeFilePath(FilePath workingDirectory, String filePath) throws IOException {
+        return workingDirectory.validateRelativeDirectory(filePath);
+    }
+
+    private boolean doesFileExist(FilePath workingDirectory, String filePath) throws IOException, InterruptedException {
+        FilePath path = new FilePath(workingDirectory, filePath);
+        return path.exists();
     }
 
     @Extension
@@ -68,7 +86,11 @@ public class AnalyzeDirectoryEntry extends AbstractDescribableImpl<AnalyzeDirect
 
         @SuppressWarnings("unused")
         public FormValidation doCheckSubDirectoryPath(@QueryParameter String value) throws IOException, ServletException {
-            return CommandArgumentHelper.isFormFieldEmpty(value);
+            boolean empty = ValidationHelper.isFormFieldEmpty(value);
+            if (empty) {
+                return FormValidation.error(Messages.build_commandline_empty_field());
+            }
+            return FormValidation.ok();
         }
     }
 }

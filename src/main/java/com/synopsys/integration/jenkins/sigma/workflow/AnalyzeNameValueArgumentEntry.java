@@ -9,8 +9,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 import com.synopsys.integration.jenkins.sigma.Messages;
-import com.synopsys.integration.jenkins.sigma.common.CommandArgumentHelper;
 import com.synopsys.integration.jenkins.sigma.common.SigmaBuildContext;
+import com.synopsys.integration.jenkins.sigma.common.ValidationHelper;
 import com.synopsys.integration.jenkins.sigma.common.ValidationResult;
 
 import hudson.Extension;
@@ -52,6 +52,14 @@ public class AnalyzeNameValueArgumentEntry extends AnalyzeArgumentEntry {
 
     @Override
     public ValidationResult validateArgument(SigmaBuildContext buildContext, FilePath workingDirectory) {
+        boolean nameValid = ValidationHelper.isNameValid(getName());
+        if (!nameValid) {
+            return ValidationResult.error(getName(), getValue(), "Argument name is invalid. It is a reserved argument name.");
+        }
+        if (StringUtils.isBlank(getValue())) {
+            return ValidationResult.error(getName(), getValue(), "Argument value cannot be empty");
+        }
+
         return ValidationResult.success(getName(), getValue());
     }
 
@@ -64,12 +72,25 @@ public class AnalyzeNameValueArgumentEntry extends AnalyzeArgumentEntry {
 
         @SuppressWarnings("unused")
         public FormValidation doCheckName(@QueryParameter String value) throws IOException, ServletException {
-            return CommandArgumentHelper.isFormFieldEmpty(value);
+            boolean empty = ValidationHelper.isFormFieldEmpty(value);
+            if (empty) {
+                return FormValidation.error(Messages.build_commandline_empty_field());
+            }
+
+            if (!ValidationHelper.isNameValid(value)) {
+                return FormValidation.error(Messages.build_commandline_reserved_name());
+            }
+
+            return FormValidation.ok();
         }
 
         @SuppressWarnings("unused")
         public FormValidation doCheckValue(@QueryParameter String value) throws IOException, ServletException {
-            return CommandArgumentHelper.isFormFieldEmpty(value);
+            boolean empty = ValidationHelper.isFormFieldEmpty(value);
+            if (empty) {
+                return FormValidation.error(Messages.build_commandline_empty_field());
+            }
+            return FormValidation.ok();
         }
     }
 }

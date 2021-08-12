@@ -141,8 +141,16 @@ public class SigmaBinaryStep extends Builder {
             // 7. additional arguments
             // 8. directories to analyze (always the last argument)
             FilePath workingDirectory = getWorkingDirectory(build, sigmaBuildContext);
+            List<ValidationResult> validationResults = validateArguments(sigmaBuildContext, workingDirectory);
+            boolean hasValidationErrors = validationResults.stream()
+                .anyMatch(ValidationResult::isError);
+            if (hasValidationErrors) {
+                logValidationErrors(sigmaBuildContext, validationResults);
+                build.setResult(Result.ABORTED);
+                return false;
+            }
+
             commandLineBuilder = addSigmaExecutableToCommand(sigmaBuildContext, commandLineBuilder);
-            List<ValidationResult> commandLineValidationErrors = new LinkedList<>();
             commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, configFileEntries);
             commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, policyFileEntries);
             commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, CommonCommandLineEntry.toAppendableList());
@@ -154,12 +162,11 @@ public class SigmaBinaryStep extends Builder {
                 return true;
             }
         } catch (final InterruptedException e) {
-            logger.error("[ERROR] Synopsys Sigma thread was interrupted.", e);
+            listener.error("[ERROR] Synopsys Sigma thread was interrupted.", e);
             build.setResult(Result.ABORTED);
             Thread.currentThread().interrupt();
         } catch (final Exception ex) {
-            logger.error("[ERROR] " + ex.getMessage());
-            logger.debug(ex.getMessage(), ex);
+            listener.error("[ERROR] " + ex.getMessage());
             ex.printStackTrace(listener.fatalError(FAILURE_MESSAGE + "sigma command execution failed."));
             build.setResult(Result.UNSTABLE);
         }
@@ -199,7 +206,7 @@ public class SigmaBinaryStep extends Builder {
                 EnvVars environment = sigmaBuildContext.getEnvironment();
                 SigmaToolInstallation installation = sigmaTool.get().forNode(node, listener);
                 installation = installation.forEnvironment(environment);
-                logger.info("Sigma tool installation found. {}", installation.getHome());
+                sigmaBuildContext.getListener().getLogger().println(String.format("Sigma tool installation found. %s", installation.getHome()));
                 commandLineBuilder.add(installation.getExecutablePath(launcher));
             }
         } else {
@@ -211,6 +218,28 @@ public class SigmaBinaryStep extends Builder {
             }
         }
         return commandLineBuilder;
+    }
+
+    private List<ValidationResult> validateArguments(SigmaBuildContext sigmaBuildContext, FilePath workingDirectory) {
+        List<ValidationResult> commandLineValidations = new LinkedList<>();
+        commandLineValidations.addAll(CommandArgumentHelper.validateArguments(sigmaBuildContext, workingDirectory, configFileEntries));
+        commandLineValidations.addAll(CommandArgumentHelper.validateArguments(sigmaBuildContext, workingDirectory, policyFileEntries));
+        commandLineValidations.addAll(CommandArgumentHelper.validateArguments(sigmaBuildContext, workingDirectory, additionalAnalyzeArguments));
+        commandLineValidations.addAll(CommandArgumentHelper.validateArguments(sigmaBuildContext, workingDirectory, analyzeDirectories));
+        return commandLineValidations;
+    }
+
+    private void logValidationErrors(SigmaBuildContext sigmaBuildContext, List<ValidationResult> validationResults) {
+        sigmaBuildContext.getListener().error("[ERROR] The configuration of Sigma command line arguments is invalid. See the details below: ");
+        for (ValidationResult result : validationResults) {
+            if (result.isError()) {
+                if (result.hasValue()) {
+                    sigmaBuildContext.getListener().error("[ERROR] %s: %s cause: %s", result.getName(), result.getValue(), result.getErrorMessage());
+                } else {
+                    sigmaBuildContext.getListener().error("[ERROR] %s: cause: %s", result.getName(), result.getErrorMessage());
+                }
+            }
+        }
     }
 
     private Result executeSigma(SigmaBuildContext sigmaBuildContext, ArgumentListBuilder commandLineBuilder, FilePath workingDirectory) throws IOException, InterruptedException {
@@ -294,6 +323,5 @@ public class SigmaBinaryStep extends Builder {
 
             return items;
         }
-
     }
 }
