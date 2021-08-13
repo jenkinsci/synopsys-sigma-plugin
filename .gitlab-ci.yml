@@ -1,0 +1,24 @@
+# This setup allows caching of dependencies between runs
+variables:
+  GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle
+
+# Create a per-branch cache
+cache:
+  key: ${CI_PROJECT_PATH}
+  paths:
+    - .gradle/wrapper/
+    - .gradle/caches/
+
+# Jobs within a single stage are run in parallel - stages overall are run in sequence
+stages:
+  - build
+
+# Build job
+gradleAssembleJob:
+  image: blackducksoftware/java-build:jdk8
+  stage: build
+  script:
+    - bash ./gradlew build --stacktrace --parallel
+  artifacts:
+    paths:
+      - build/libs/*.hpi
