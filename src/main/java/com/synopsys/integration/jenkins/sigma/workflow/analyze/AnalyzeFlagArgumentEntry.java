@@ -1,4 +1,4 @@
-package com.synopsys.integration.jenkins.sigma.workflow;
+package com.synopsys.integration.jenkins.sigma.workflow.analyze;
 
 import java.io.IOException;
 
@@ -34,6 +34,8 @@ public class AnalyzeFlagArgumentEntry extends AnalyzeArgumentEntry {
     @Override
     public void appendToArgumentList(final ArgumentListBuilder argumentListBuilder) {
         if (getName().trim().startsWith("--")) {
+            argumentListBuilder.add(getName().trim());
+        } else if (getName().trim().startsWith("-")) {
             argumentListBuilder.add(getName().trim());
         } else {
             argumentListBuilder.add(String.format("--%s", getName().trim()));

@@ -22,6 +22,7 @@ import hudson.util.ArgumentListBuilder;
 import hudson.util.FormValidation;
 
 public class ConfigFileEntry extends AbstractDescribableImpl<ConfigFileEntry> implements AppendableArgument {
+    private static final String COMMAND_FLAG_CONFIG = "--config";
     private String configFilePath;
 
     @DataBoundConstructor
@@ -37,7 +38,7 @@ public class ConfigFileEntry extends AbstractDescribableImpl<ConfigFileEntry> im
     @Override
     public void appendToArgumentList(ArgumentListBuilder argumentListBuilder) {
         if (StringUtils.isNotBlank(configFilePath)) {
-            argumentListBuilder.add("--config");
+            argumentListBuilder.add(COMMAND_FLAG_CONFIG);
             argumentListBuilder.add(configFilePath.trim());
         }
     }
@@ -46,9 +47,9 @@ public class ConfigFileEntry extends AbstractDescribableImpl<ConfigFileEntry> im
     public ValidationResult validateArgument(final SigmaBuildContext buildContext, final FilePath workingDirectory) {
         boolean empty = ValidationHelper.isFormFieldEmpty(getConfigFilePath());
         if (empty) {
-            return ValidationResult.error("--config", getConfigFilePath(), "File path cannot be empty");
+            return ValidationResult.error(COMMAND_FLAG_CONFIG, getConfigFilePath(), "File path cannot be empty");
         }
-        return ValidationResult.success("--config", getConfigFilePath());
+        return ValidationResult.success(COMMAND_FLAG_CONFIG, getConfigFilePath());
     }
 
     @Extension

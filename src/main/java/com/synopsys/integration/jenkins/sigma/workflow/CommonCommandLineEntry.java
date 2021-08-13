@@ -23,7 +23,7 @@ public class CommonCommandLineEntry implements AppendableArgument {
     @Override
     public void appendToArgumentList(final ArgumentListBuilder argumentListBuilder) {
         argumentListBuilder.add("--working-dir");
-        argumentListBuilder.add("${WORKSPACE}/idir");
+        argumentListBuilder.add("${WORKSPACE}/.sigma-dir");
         argumentListBuilder.add("analyze");
         argumentListBuilder.add("--format");
         argumentListBuilder.add("jenkins");

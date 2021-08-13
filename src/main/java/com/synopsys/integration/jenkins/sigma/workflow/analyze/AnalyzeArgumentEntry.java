@@ -1,4 +1,4 @@
-package com.synopsys.integration.jenkins.sigma.workflow;
+package com.synopsys.integration.jenkins.sigma.workflow.analyze;
 
 import com.synopsys.integration.jenkins.sigma.common.AppendableArgument;
 

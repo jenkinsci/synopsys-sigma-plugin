@@ -1,4 +1,4 @@
-package com.synopsys.integration.jenkins.sigma.workflow;
+package com.synopsys.integration.jenkins.sigma.workflow.analyze;
 
 import java.io.IOException;
 

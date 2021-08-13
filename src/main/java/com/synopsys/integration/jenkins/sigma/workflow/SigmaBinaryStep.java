@@ -22,6 +22,8 @@ import com.synopsys.integration.jenkins.sigma.common.CommandArgumentHelper;
 import com.synopsys.integration.jenkins.sigma.common.SigmaBuildContext;
 import com.synopsys.integration.jenkins.sigma.common.ValidationResult;
 import com.synopsys.integration.jenkins.sigma.tool.SigmaToolInstallation;
+import com.synopsys.integration.jenkins.sigma.workflow.analyze.AnalyzeArgumentEntry;
+import com.synopsys.integration.jenkins.sigma.workflow.analyze.AnalyzeDirectoryEntry;
 
 import hudson.AbortException;
 import hudson.CopyOnWrite;
@@ -48,7 +50,7 @@ public class SigmaBinaryStep extends Builder {
     private final String sigmaToolName;
     private List<AnalyzeArgumentEntry> additionalAnalyzeArguments;
     private List<ConfigFileEntry> configFileEntries;
-    private List<PolicyFileEntry> policyFileEntries;
+    private String policyFilePath;
     private List<AnalyzeDirectoryEntry> analyzeDirectories;
 
     @DataBoundConstructor
@@ -59,6 +61,17 @@ public class SigmaBinaryStep extends Builder {
     @SuppressWarnings("unused")
     public String getSigmaToolName() {
         return sigmaToolName;
+    }
+
+    @SuppressWarnings("unused")
+    public String getPolicyFilePath() {
+        return policyFilePath;
+    }
+
+    @SuppressWarnings("unused")
+    @DataBoundSetter
+    public void setPolicyFilePath(final String policyFilePath) {
+        this.policyFilePath = policyFilePath;
     }
 
     @SuppressWarnings("unused")
@@ -81,17 +94,6 @@ public class SigmaBinaryStep extends Builder {
     @DataBoundSetter
     public void setConfigFileEntries(final List<ConfigFileEntry> configFileEntries) {
         this.configFileEntries = initEntryList(configFileEntries);
-    }
-
-    @SuppressWarnings("unused")
-    public List<PolicyFileEntry> getPolicyFileEntries() {
-        return policyFileEntries;
-    }
-
-    @SuppressWarnings("unused")
-    @DataBoundSetter
-    public void setPolicyFileEntries(final List<PolicyFileEntry> policyFileEntries) {
-        this.policyFileEntries = initEntryList(policyFileEntries);
     }
 
     @SuppressWarnings("unused")
@@ -152,7 +154,7 @@ public class SigmaBinaryStep extends Builder {
 
             commandLineBuilder = addSigmaExecutableToCommand(sigmaBuildContext, commandLineBuilder);
             commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, configFileEntries);
-            commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, policyFileEntries);
+            commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, PolicyFileEntry.toAppendableList(policyFilePath));
             commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, CommonCommandLineEntry.toAppendableList());
             commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, additionalAnalyzeArguments);
             commandLineBuilder = CommandArgumentHelper.addCommandLineArguments(commandLineBuilder, analyzeDirectories);
@@ -223,7 +225,7 @@ public class SigmaBinaryStep extends Builder {
     private List<ValidationResult> validateArguments(SigmaBuildContext sigmaBuildContext, FilePath workingDirectory) {
         List<ValidationResult> commandLineValidations = new LinkedList<>();
         commandLineValidations.addAll(CommandArgumentHelper.validateArguments(sigmaBuildContext, workingDirectory, configFileEntries));
-        commandLineValidations.addAll(CommandArgumentHelper.validateArguments(sigmaBuildContext, workingDirectory, policyFileEntries));
+        commandLineValidations.addAll(CommandArgumentHelper.validateArguments(sigmaBuildContext, workingDirectory, PolicyFileEntry.toAppendableList(policyFilePath)));
         commandLineValidations.addAll(CommandArgumentHelper.validateArguments(sigmaBuildContext, workingDirectory, additionalAnalyzeArguments));
         commandLineValidations.addAll(CommandArgumentHelper.validateArguments(sigmaBuildContext, workingDirectory, analyzeDirectories));
         return commandLineValidations;
@@ -254,6 +256,7 @@ public class SigmaBinaryStep extends Builder {
             .cmds(commands)
             .envs(sigmaBuildContext.getEnvironment())
             .pwd(workingDirectory)
+            .stdout(sigmaBuildContext.getListener())
             .join();
 
         if (returnCode != 0) {

@@ -1,4 +1,4 @@
-package com.synopsys.integration.jenkins.sigma.workflow;
+package com.synopsys.integration.jenkins.sigma.workflow.analyze;
 
 import java.io.IOException;
 
@@ -42,6 +42,8 @@ public class AnalyzeNameValueArgumentEntry extends AnalyzeArgumentEntry {
         // TODO may not need to test if the validate is called first.
         if (StringUtils.isNotBlank(name) && StringUtils.isNotBlank(value)) {
             if (getName().trim().startsWith("--")) {
+                argumentListBuilder.add(getName().trim());
+            } else if (getName().trim().startsWith("-")) {
                 argumentListBuilder.add(getName().trim());
             } else {
                 argumentListBuilder.add(String.format("--%s", getName().trim()));
