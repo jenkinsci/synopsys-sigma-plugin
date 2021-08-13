@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import com.synopsys.integration.jenkins.sigma.Messages;
+
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
@@ -59,7 +61,7 @@ public class SigmaBinaryInstaller extends DownloadFromUrlInstaller {
     @Extension
     public static final class DescriptorImpl extends ToolInstallerDescriptor<SigmaBinaryInstaller> {
         public String getDisplayName() {
-            return "Install Sigma";
+            return Messages.installer_displayName();
         }
 
         @Override

@@ -9,6 +9,7 @@ import java.util.List;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import com.synopsys.integration.jenkins.sigma.Messages;
 import com.synopsys.integration.jenkins.sigma.workflow.SigmaBinaryStep;
 
 import hudson.EnvVars;
@@ -71,7 +72,7 @@ public class SigmaToolInstallation extends ToolInstallation implements Environme
 
         @Override
         public String getDisplayName() {
-            return "Sigma";
+            return Messages.installation_displayName();
         }
 
         @Override
