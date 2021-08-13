@@ -14,7 +14,7 @@ stages:
   - build
 
 # Build job
-gradleAssembleJob:
+gradleBuildJob:
   image: blackducksoftware/java-build:jdk8
   stage: build
   script:
