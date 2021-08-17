@@ -1,5 +1,7 @@
 package com.synopsys.integration.jenkins.sigma.argument.analyze;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.synopsys.integration.jenkins.sigma.SigmaBuildContext;
 import com.synopsys.integration.jenkins.sigma.validator.ValidationHelper;
 import com.synopsys.integration.jenkins.sigma.validator.ValidationResult;
@@ -30,7 +32,7 @@ public class FlagArgument extends NamedAnalyzeArgument {
 
     @Override
     public ValidationResult validateArgument(final SigmaBuildContext buildContext, final FilePath workingDirectory) {
-        if (ValidationHelper.isFormFieldEmpty(getName())) {
+        if (StringUtils.isBlank(getName())) {
             return ValidationResult.error(getName(), "Argument name is invalid. Cannot be empty.");
         }
         if (!ValidationHelper.isNameValid(getName())) {

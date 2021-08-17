@@ -2,6 +2,8 @@ package com.synopsys.integration.jenkins.sigma;
 
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.model.BuildListener;
@@ -15,7 +17,7 @@ public class SigmaBuildContext {
     private final VirtualChannel virtualChannel;
     private final EnvVars environment;
 
-    public SigmaBuildContext(Launcher launcher, BuildListener listener, Node node, VirtualChannel virtualChannel, EnvVars environment) {
+    public SigmaBuildContext(Launcher launcher, BuildListener listener, @Nullable Node node, @Nullable VirtualChannel virtualChannel, EnvVars environment) {
         this.launcher = launcher;
         this.listener = listener;
         this.node = node;

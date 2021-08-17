@@ -4,7 +4,6 @@ import org.apache.commons.lang.StringUtils;
 
 import com.synopsys.integration.jenkins.sigma.SigmaBuildContext;
 import com.synopsys.integration.jenkins.sigma.validator.ArgumentValidator;
-import com.synopsys.integration.jenkins.sigma.validator.ValidationHelper;
 import com.synopsys.integration.jenkins.sigma.validator.ValidationResult;
 
 import hudson.FilePath;
@@ -36,7 +35,7 @@ public class ConfigFileArgument implements AppendableArgument, ArgumentValidator
 
     @Override
     public ValidationResult validateArgument(SigmaBuildContext buildContext, FilePath workingDirectory) {
-        boolean empty = ValidationHelper.isFormFieldEmpty(getConfigFilePath());
+        boolean empty = StringUtils.isBlank(getConfigFilePath());
         if (empty) {
             return ValidationResult.error(COMMAND_FLAG_CONFIG, getConfigFilePath(), "File path cannot be empty");
         }

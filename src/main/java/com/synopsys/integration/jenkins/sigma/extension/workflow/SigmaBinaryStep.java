@@ -69,17 +69,8 @@ public class SigmaBinaryStep extends Builder {
             }
 
             SigmaBuildContext sigmaBuildContext = createBuildContext(build, launcher, listener);
-
-            if (!sigmaBuildContext.getNode().isPresent()) {
-                throw new AbortException(FAILURE_MESSAGE + "Could not access node.");
-            }
-
-            if (!sigmaBuildContext.getVirtualChannel().isPresent()) {
-                String nodeName = sigmaBuildContext.getNode()
-                    .map(Node::getDisplayName)
-                    .orElse("Unknown node");
-                throw new AbortException(FAILURE_MESSAGE + "Configured node \"" + nodeName + "\" is either not connected or offline.");
-            }
+            Node node = sigmaBuildContext.getNode().orElseThrow(() -> new AbortException(FAILURE_MESSAGE + "Could not access node."));
+            sigmaBuildContext.getVirtualChannel().orElseThrow(() -> new AbortException(FAILURE_MESSAGE + "Configured node \"" + node.getDisplayName() + "\" is either not connected or offline."));
 
             FilePath workingDirectory = getWorkingDirectory(build, sigmaBuildContext);
             JenkinsDataConverter jenkinsDataConverter = new JenkinsDataConverter(getSigma().orElse(null), policyFilePath, configFileEntries, additionalAnalyzeArguments, analyzeDirectories);

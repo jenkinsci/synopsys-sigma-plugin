@@ -41,7 +41,7 @@ public class NameValueArgument extends NamedAnalyzeArgument {
 
     @Override
     public ValidationResult validateArgument(SigmaBuildContext buildContext, FilePath workingDirectory) {
-        if (ValidationHelper.isFormFieldEmpty(getName())) {
+        if (StringUtils.isBlank(getName())) {
             return ValidationResult.error(getName(), "Argument name is invalid. Cannot be empty.");
         }
         if (!ValidationHelper.isNameValid(getName())) {

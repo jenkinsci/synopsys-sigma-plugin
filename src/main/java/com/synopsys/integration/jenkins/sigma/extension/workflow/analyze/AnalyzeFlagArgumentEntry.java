@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -37,7 +38,7 @@ public class AnalyzeFlagArgumentEntry extends AnalyzeArgumentEntry {
 
         @SuppressWarnings("unused")
         public FormValidation doCheckName(@QueryParameter String value) throws IOException, ServletException {
-            boolean empty = ValidationHelper.isFormFieldEmpty(value);
+            boolean empty = StringUtils.isBlank(value);
             if (empty) {
                 return FormValidation.error(Messages.build_commandline_empty_field());
             }

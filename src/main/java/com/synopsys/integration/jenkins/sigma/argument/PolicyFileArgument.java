@@ -4,7 +4,6 @@ import org.apache.commons.lang.StringUtils;
 
 import com.synopsys.integration.jenkins.sigma.SigmaBuildContext;
 import com.synopsys.integration.jenkins.sigma.validator.ArgumentValidator;
-import com.synopsys.integration.jenkins.sigma.validator.ValidationHelper;
 import com.synopsys.integration.jenkins.sigma.validator.ValidationResult;
 
 import hudson.FilePath;
@@ -32,7 +31,7 @@ public class PolicyFileArgument implements AppendableArgument, ArgumentValidator
 
     @Override
     public ValidationResult validateArgument(final SigmaBuildContext buildContext, final FilePath workingDirectory) {
-        boolean empty = ValidationHelper.isFormFieldEmpty(policyFilePath);
+        boolean empty = StringUtils.isBlank(policyFilePath);
         if (empty) {
             return ValidationResult.error(ARGUMENT_NAME_POLICY, policyFilePath, "File path cannot be empty");
         }

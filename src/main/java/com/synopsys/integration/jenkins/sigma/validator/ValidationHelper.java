@@ -3,8 +3,6 @@ package com.synopsys.integration.jenkins.sigma.validator;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-
 public class ValidationHelper {
     public static Set<String> RESERVED_ARGUMENT_NAMES;
 
@@ -21,13 +19,6 @@ public class ValidationHelper {
 
     private ValidationHelper() {
         // prevent construction
-    }
-
-    public static boolean isFormFieldEmpty(String value) {
-        if (StringUtils.isBlank(value)) {
-            return true;
-        }
-        return false;
     }
 
     public static boolean isNameValid(String name) {

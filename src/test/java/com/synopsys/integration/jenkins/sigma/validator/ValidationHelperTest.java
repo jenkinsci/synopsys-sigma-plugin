@@ -6,18 +6,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class ValidationHelperTest {
-    @Test
-    public void testFormFieldEmpty() {
-        assertTrue(ValidationHelper.isFormFieldEmpty(""));
-        assertTrue(ValidationHelper.isFormFieldEmpty(null));
-        assertTrue(ValidationHelper.isFormFieldEmpty("          "));
-        assertTrue(ValidationHelper.isFormFieldEmpty("\t"));
-    }
-
-    @Test
-    public void testFormFieldPopulated() {
-        assertFalse(ValidationHelper.isFormFieldEmpty("For field value"));
-    }
 
     @Test
     public void testNameValid() {

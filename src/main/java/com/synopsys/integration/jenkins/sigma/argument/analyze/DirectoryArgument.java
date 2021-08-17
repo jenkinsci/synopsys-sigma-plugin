@@ -7,7 +7,6 @@ import org.apache.commons.lang.StringUtils;
 import com.synopsys.integration.jenkins.sigma.SigmaBuildContext;
 import com.synopsys.integration.jenkins.sigma.argument.AppendableArgument;
 import com.synopsys.integration.jenkins.sigma.validator.ArgumentValidator;
-import com.synopsys.integration.jenkins.sigma.validator.ValidationHelper;
 import com.synopsys.integration.jenkins.sigma.validator.ValidationResult;
 
 import hudson.FilePath;
@@ -41,7 +40,7 @@ public class DirectoryArgument implements AppendableArgument, ArgumentValidator 
         String path = getSubDirectoryPath();
         String fieldName = "analyze directory";
         try {
-            boolean subDirectoryEmpty = ValidationHelper.isFormFieldEmpty(path);
+            boolean subDirectoryEmpty = StringUtils.isBlank(path);
             FormValidation relativePath = isRelativeFilePath(workingDirectory, path);
 
             if (subDirectoryEmpty) {
