@@ -6,7 +6,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 public class ValidationHelper {
-    private static Set<String> RESERVED_ARGUMENT_NAMES;
+    public static Set<String> RESERVED_ARGUMENT_NAMES;
 
     // Please note that if you modify this list check the help HTML files to determine if the files need to be updated.
     static {
