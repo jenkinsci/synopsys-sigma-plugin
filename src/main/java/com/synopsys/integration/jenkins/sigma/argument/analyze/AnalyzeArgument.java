@@ -9,7 +9,7 @@ import hudson.FilePath;
 import hudson.util.ArgumentListBuilder;
 
 public class AnalyzeArgument implements AppendableArgument, ArgumentValidator {
-    private static final String COMMAND_FLAG_ANALYZE = "analyze";
+    public static final String ARGUMENT_NAME_ANALYZE = "analyze";
 
     private AnalyzeArgument() {
     }
@@ -20,11 +20,11 @@ public class AnalyzeArgument implements AppendableArgument, ArgumentValidator {
 
     @Override
     public void appendToArgumentList(final ArgumentListBuilder argumentListBuilder) {
-        argumentListBuilder.add(COMMAND_FLAG_ANALYZE);
+        argumentListBuilder.add(ARGUMENT_NAME_ANALYZE);
     }
 
     @Override
     public ValidationResult validateArgument(SigmaBuildContext buildContext, FilePath workingDirectory) {
-        return ValidationResult.success(COMMAND_FLAG_ANALYZE);
+        return ValidationResult.success(ARGUMENT_NAME_ANALYZE);
     }
 }

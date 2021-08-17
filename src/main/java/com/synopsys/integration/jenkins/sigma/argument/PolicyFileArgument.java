@@ -11,7 +11,7 @@ import hudson.FilePath;
 import hudson.util.ArgumentListBuilder;
 
 public class PolicyFileArgument implements AppendableArgument, ArgumentValidator {
-    private static final String COMMAND_FLAG_POLICY = "--policy";
+    public static final String ARGUMENT_NAME_POLICY = "--policy";
     private String policyFilePath;
 
     private PolicyFileArgument(final String policyFilePath) {
@@ -25,7 +25,7 @@ public class PolicyFileArgument implements AppendableArgument, ArgumentValidator
     @Override
     public void appendToArgumentList(ArgumentListBuilder argumentListBuilder) {
         if (StringUtils.isNotBlank(policyFilePath)) {
-            argumentListBuilder.add(COMMAND_FLAG_POLICY);
+            argumentListBuilder.add(ARGUMENT_NAME_POLICY);
             argumentListBuilder.add(policyFilePath.trim());
         }
     }
@@ -34,8 +34,8 @@ public class PolicyFileArgument implements AppendableArgument, ArgumentValidator
     public ValidationResult validateArgument(final SigmaBuildContext buildContext, final FilePath workingDirectory) {
         boolean empty = ValidationHelper.isFormFieldEmpty(policyFilePath);
         if (empty) {
-            return ValidationResult.error(COMMAND_FLAG_POLICY, policyFilePath, "File path cannot be empty");
+            return ValidationResult.error(ARGUMENT_NAME_POLICY, policyFilePath, "File path cannot be empty");
         }
-        return ValidationResult.success(COMMAND_FLAG_POLICY, policyFilePath);
+        return ValidationResult.success(ARGUMENT_NAME_POLICY, policyFilePath);
     }
 }
