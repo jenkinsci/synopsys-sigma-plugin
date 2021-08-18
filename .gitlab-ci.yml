@@ -1,3 +1,8 @@
+# Copyright (c) 2021 Synopsys, Inc. All rights reserved worldwide.
+include:
+  - local: gitlab-ci/common-variables.yml
+  - local: gitlab-ci/release.yml
+
 # This setup allows caching of dependencies between runs
 variables:
   GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle
@@ -13,6 +18,7 @@ cache:
 stages:
   - build
   - test
+  - release
 
 # Build job
 gradleBuildJob:
@@ -23,9 +29,10 @@ gradleBuildJob:
   artifacts:
     paths:
       - build/libs/*.hpi
+
 # Test job
 gradleTestJob:
-  image: blackducksoftware/java-build:jdk8
-  stage: test
-  script:
-    - bash ./gradlew build --stacktrace --parallel
+ image: blackducksoftware/java-build:jdk8
+ stage: test
+ script:
+   - bash ./gradlew build --stacktrace --parallel
