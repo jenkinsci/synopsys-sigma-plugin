@@ -11,7 +11,7 @@ plugins {
 }
 
 group = 'org.jenkins-ci.plugins'
-version = '0.0.1-SNAPSHOT'
+version = "0.0.1-SNAPSHOT"
 description = 'Allows users to run Sigma commands in their builds'
 
 jenkinsPlugin {

@@ -1,0 +1,54 @@
+# Copyright (c) 2021 Synopsys, Inc. All rights reserved worldwide.
+.jfrog_variables: &jfrog_variables
+  JFROG_CLI_BUILD_NAME: "${CI_PIPELINE_URL}"
+  JFROG_CLI_BUILD_NUMBER: "${CI_PIPELINE_IID}"
+  JFROG_CLI_BUILD_URL: "${CI_PIPELINE_URL}"
+.jfrog_before_script: &jfrog_before_script
+  - curl --silent --output jfrog $ARTIFACTORY_JFROG_URL
+  - chmod a+x jfrog
+  - ./jfrog rt config import ${SIGMA_CICD_ARTIFACTORY_CONFIG}
+
+# Do not use this job in an extends key. This mock job exists only to contain relevant yaml anchors.
+.common_rules_for_interactive_pipelines:
+  - &always_run_for_tags
+    if: $CI_COMMIT_TAG
+  - &always_run_for_master_branch # The current DEFAULT branch is 'master'. If this ever changes, the name of this job should be updated.
+    if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+#####################################
+# Releases from the "master" branch.
+#####################################
+upload_unreleased_to_artifactory:
+  image: releng/base-gitlab-runner:jdk8-python3.8-git
+  stage: release
+  cache: [ ]
+  needs:
+    - gradleBuildJob
+    - gradleTestJob
+  variables: *jfrog_variables
+  before_script: *jfrog_before_script
+  script:
+    - VERSION=$(grep '^version = "' build.gradle  | sed -E 's/version = "([0-9](.[0-9])*-SNAPSHOT)"/\1/')
+    - ./jfrog rt upload --server-id sig-artifactory --fail-no-op "build/libs/synopsys-sigma*.hpi" synopsys-sigma-jenkins-local/unreleased/${VERSION}/
+    - ./jfrog rt upload --server-id sig-artifactory --fail-no-op "build/libs/synopsys-sigma*.hpi" synopsys-sigma-jenkins-local/unreleased/latest/
+  rules:
+    - *always_run_for_master_branch
+
+
+# Upload the binaries and containers suitable for external release.
+upload_released_to_artifactory:
+  image: releng/base-gitlab-runner:jdk8-python3.8-git
+  stage: release
+  cache: [ ]
+  needs:
+    - gradleBuildJob
+    - gradleTestJob
+  variables: *jfrog_variables
+  before_script: *jfrog_before_script
+  script:
+    # at release time, "-SNAPSHOT" will be removed from the build.gradle file
+    - VERSION=$(grep '^version = "' build.gradle  | sed -E 's/version = "([0-9](.[0-9])*-SNAPSHOT)"/\1/')
+    - ./jfrog rt upload --server-id sig-artifactory --fail-no-op "build/libs/synopsys-sigma*.hpi" synopsys-sigma-jenkins-local/released/${VERSION}/
+    - ./jfrog rt upload --server-id sig-artifactory --fail-no-op "build/libs/synopsys-sigma*.hpi" synopsys-sigma-jenkins-local/released/latest/
+  rules:
+    - *always_run_for_tags
