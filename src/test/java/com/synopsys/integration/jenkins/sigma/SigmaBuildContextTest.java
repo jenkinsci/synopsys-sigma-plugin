@@ -4,15 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
+
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import com.synopsys.integration.jenkins.sigma.extension.tool.SigmaToolInstallation;
 
 import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.model.BuildListener;
-import hudson.model.Node;
 import hudson.model.TaskListener;
-import hudson.remoting.VirtualChannel;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
 
 public class SigmaBuildContextTest {
@@ -20,17 +22,15 @@ public class SigmaBuildContextTest {
     public void testBuildContext() {
         TaskListener taskListener = null;
         BuildListener buildListener = Mockito.mock(BuildListener.class);
-        VirtualChannel virtualChannel = Mockito.mock(VirtualChannel.class);
-        Node node = Mockito.mock(Node.class);
+        SigmaToolInstallation sigmaToolInstallation = new SigmaToolInstallation("sigma-test", "test/home", Collections.emptyList());
         EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
         EnvVars envVars = prop.getEnvVars();
         Launcher launcher = new Launcher.LocalLauncher(taskListener);
-        SigmaBuildContext buildContext = new SigmaBuildContext(launcher, buildListener, node, virtualChannel, envVars);
+        SigmaBuildContext buildContext = new SigmaBuildContext(launcher, buildListener, envVars, sigmaToolInstallation);
         assertEquals(launcher, buildContext.getLauncher());
         assertEquals(buildListener, buildContext.getListener());
-        assertTrue(buildContext.getNode().isPresent());
-        assertEquals(node, buildContext.getNode().get());
-        assertEquals(virtualChannel, buildContext.getVirtualChannel().get());
+        assertTrue(buildContext.getSigmaToolInstallation().isPresent());
+        assertEquals(sigmaToolInstallation, buildContext.getSigmaToolInstallation().get());
         assertEquals(envVars, buildContext.getEnvironment());
     }
 
@@ -41,11 +41,10 @@ public class SigmaBuildContextTest {
         EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
         EnvVars envVars = prop.getEnvVars();
         Launcher launcher = new Launcher.LocalLauncher(taskListener);
-        SigmaBuildContext buildContext = new SigmaBuildContext(launcher, buildListener, null, null, envVars);
+        SigmaBuildContext buildContext = new SigmaBuildContext(launcher, buildListener, envVars, null);
         assertEquals(launcher, buildContext.getLauncher());
         assertEquals(buildListener, buildContext.getListener());
         assertEquals(envVars, buildContext.getEnvironment());
-        assertFalse(buildContext.getNode().isPresent());
-        assertFalse(buildContext.getVirtualChannel().isPresent());
+        assertFalse(buildContext.getSigmaToolInstallation().isPresent());
     }
 }

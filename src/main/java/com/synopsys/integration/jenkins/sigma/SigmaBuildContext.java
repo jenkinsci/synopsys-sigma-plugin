@@ -4,44 +4,38 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+import com.synopsys.integration.jenkins.sigma.extension.tool.SigmaToolInstallation;
+
 import hudson.EnvVars;
 import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.Node;
-import hudson.remoting.VirtualChannel;
+import hudson.model.TaskListener;
 
 public class SigmaBuildContext {
     private final Launcher launcher;
-    private final BuildListener listener;
-    private final Node node;
-    private final VirtualChannel virtualChannel;
+    private final TaskListener listener;
     private final EnvVars environment;
+    private final SigmaToolInstallation sigmaToolInstallation;
 
-    public SigmaBuildContext(Launcher launcher, BuildListener listener, @Nullable Node node, @Nullable VirtualChannel virtualChannel, EnvVars environment) {
+    public SigmaBuildContext(Launcher launcher, TaskListener listener, EnvVars environment, @Nullable SigmaToolInstallation sigmaToolInstallation) {
         this.launcher = launcher;
         this.listener = listener;
-        this.node = node;
-        this.virtualChannel = virtualChannel;
         this.environment = environment;
+        this.sigmaToolInstallation = sigmaToolInstallation;
     }
 
     public Launcher getLauncher() {
         return launcher;
     }
 
-    public BuildListener getListener() {
+    public TaskListener getListener() {
         return listener;
-    }
-
-    public Optional<Node> getNode() {
-        return Optional.ofNullable(node);
-    }
-
-    public Optional<VirtualChannel> getVirtualChannel() {
-        return Optional.ofNullable(virtualChannel);
     }
 
     public EnvVars getEnvironment() {
         return environment;
+    }
+
+    public Optional<SigmaToolInstallation> getSigmaToolInstallation() {
+        return Optional.ofNullable(sigmaToolInstallation);
     }
 }

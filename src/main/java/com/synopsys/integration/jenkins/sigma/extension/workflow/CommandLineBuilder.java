@@ -11,10 +11,8 @@ import org.apache.commons.lang.StringUtils;
 import com.synopsys.integration.jenkins.sigma.SigmaBuildContext;
 import com.synopsys.integration.jenkins.sigma.extension.tool.SigmaToolInstallation;
 
-import hudson.EnvVars;
 import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.Node;
+import hudson.model.TaskListener;
 import hudson.util.ArgumentListBuilder;
 
 public class CommandLineBuilder {
@@ -22,13 +20,11 @@ public class CommandLineBuilder {
     public static final String COMMAND_TOKEN_IGNORE_POLICIES = "--ignore-policies";
     private static final String COMMAND_TOKEN_ANALYZE = "analyze";
     private SigmaBuildContext sigmaBuildContext;
-    private SigmaToolInstallation sigmaToolInstallation;
     private boolean ignorePolicies;
     private String commandLineOverride;
 
-    public CommandLineBuilder(SigmaBuildContext sigmaBuildContext, @Nullable SigmaToolInstallation sigmaToolInstallation, boolean ignorePolicies, @Nullable String commandLineOverride) {
+    public CommandLineBuilder(SigmaBuildContext sigmaBuildContext, boolean ignorePolicies, @Nullable String commandLineOverride) {
         this.sigmaBuildContext = sigmaBuildContext;
-        this.sigmaToolInstallation = sigmaToolInstallation;
         this.ignorePolicies = ignorePolicies;
         this.commandLineOverride = commandLineOverride;
     }
@@ -71,17 +67,14 @@ public class CommandLineBuilder {
 
     private void addSigmaExecutableToCommand(SigmaBuildContext sigmaBuildContext, ArgumentListBuilder commandLineBuilder) throws IOException, InterruptedException {
         Launcher launcher = sigmaBuildContext.getLauncher();
-        if (sigmaToolInstallation != null) {
-            Optional<Node> nodeOptional = sigmaBuildContext.getNode();
-            if (nodeOptional.isPresent()) {
-                Node node = nodeOptional.get();
-                BuildListener listener = sigmaBuildContext.getListener();
-                EnvVars environment = sigmaBuildContext.getEnvironment();
-                SigmaToolInstallation installation = sigmaToolInstallation.forNode(node, listener);
-                installation = installation.forEnvironment(environment);
-                sigmaBuildContext.getListener().getLogger().println(String.format("Sigma tool installation found. %s", installation.getHome()));
-                commandLineBuilder.add(installation.getExecutablePath(launcher));
-            }
+        TaskListener listener = sigmaBuildContext.getListener();
+        Optional<SigmaToolInstallation> sigmaToolInstallation = sigmaBuildContext.getSigmaToolInstallation();
+        if (sigmaToolInstallation.isPresent()) {
+            SigmaToolInstallation installation = sigmaToolInstallation.get();
+            listener.getLogger().println(String.format("Sigma tool installation found. '%s'", installation.getHome()));
+
+            installation.getExecutablePath(launcher, listener)
+                .ifPresent(commandLineBuilder::add);
         } else {
             // sigma tool installation not defined try to run sigma with a simple command.  It will work if sigma is on executable on the path
             if (sigmaBuildContext.getLauncher().isUnix()) {

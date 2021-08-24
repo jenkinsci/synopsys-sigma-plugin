@@ -15,6 +15,7 @@ import com.synopsys.integration.jenkins.sigma.extension.tool.SigmaToolInstallati
 import com.synopsys.integration.jenkins.sigma.utils.SigmaTestUtil;
 
 import hudson.model.FreeStyleProject;
+import hudson.slaves.DumbSlave;
 
 public class SigmaBinaryStepIntegrationTest {
     @Rule
@@ -31,6 +32,22 @@ public class SigmaBinaryStepIntegrationTest {
         sigmaTestUtil.addInstallation(() -> jenkinsRule.jenkins.getDescriptorByType(SigmaToolInstallation.DescriptorImpl.class));
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test Project");
         project.setScm(new SingleFileSCM("JenkinsSigmaTestClass.java", "public class JenkinsSigmaTestClass {}"));
+        SigmaBinaryStep step = new SigmaBinaryStep();
+        step.setSigmaToolName(SigmaTestUtil.TEST_TOOL_NAME);
+        assertNotNull(step.getDescriptor().getInstallations());
+        project.getBuildersList().add(step);
+        assertTrue(step.getDescriptor().isApplicable(FreeStyleProject.class));
+        jenkinsRule.buildAndAssertSuccess(project);
+
+    }
+
+    @Test
+    public void testSlaveBuildStepSucceeds() throws Exception {
+        sigmaTestUtil.addInstallation(() -> jenkinsRule.jenkins.getDescriptorByType(SigmaToolInstallation.DescriptorImpl.class));
+        FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test Project");
+        DumbSlave slave = jenkinsRule.createSlave();
+        project.setScm(new SingleFileSCM("JenkinsSigmaTestClass.java", "public class JenkinsSigmaTestClass {}"));
+        project.setAssignedNode(jenkinsRule.jenkins.getNode(slave.getNodeName()));
         SigmaBinaryStep step = new SigmaBinaryStep();
         step.setSigmaToolName(SigmaTestUtil.TEST_TOOL_NAME);
         assertNotNull(step.getDescriptor().getInstallations());
