@@ -25,14 +25,14 @@ gradleBuildJob:
   image: blackducksoftware/java-build:jdk8
   stage: build
   script:
-    - bash ./gradlew build --stacktrace --parallel
+    - bash ./gradlew build --stacktrace --parallel -i
   artifacts:
     paths:
       - build/libs/*.hpi
 
 # Test job
 gradleTestJob:
- image: blackducksoftware/java-build:jdk8
- stage: test
- script:
-   - bash ./gradlew build --stacktrace --parallel
+  image: blackducksoftware/java-build:jdk8
+  stage: test
+  script:
+    - bash ./gradlew test --stacktrace --parallel -i

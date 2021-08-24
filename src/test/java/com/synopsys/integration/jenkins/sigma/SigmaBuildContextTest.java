@@ -5,10 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-
-import com.synopsys.integration.jenkins.sigma.mocks.TestBuildListener;
-import com.synopsys.integration.jenkins.sigma.mocks.TestChannel;
-import com.synopsys.integration.jenkins.sigma.mocks.TestNode;
+import org.mockito.Mockito;
 
 import hudson.EnvVars;
 import hudson.Launcher;
@@ -22,9 +19,9 @@ public class SigmaBuildContextTest {
     @Test
     public void testBuildContext() {
         TaskListener taskListener = null;
-        BuildListener buildListener = new TestBuildListener();
-        VirtualChannel virtualChannel = new TestChannel();
-        Node node = new TestNode();
+        BuildListener buildListener = Mockito.mock(BuildListener.class);
+        VirtualChannel virtualChannel = Mockito.mock(VirtualChannel.class);
+        Node node = Mockito.mock(Node.class);
         EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
         EnvVars envVars = prop.getEnvVars();
         Launcher launcher = new Launcher.LocalLauncher(taskListener);
@@ -40,7 +37,7 @@ public class SigmaBuildContextTest {
     @Test
     public void testBuildContextEmptyFields() {
         TaskListener taskListener = null;
-        BuildListener buildListener = new TestBuildListener();
+        BuildListener buildListener = Mockito.mock(BuildListener.class);
         EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
         EnvVars envVars = prop.getEnvVars();
         Launcher launcher = new Launcher.LocalLauncher(taskListener);

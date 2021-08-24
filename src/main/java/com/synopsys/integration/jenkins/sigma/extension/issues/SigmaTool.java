@@ -11,8 +11,8 @@ import hudson.Extension;
 import io.jenkins.plugins.analysis.core.model.ReportScanningTool;
 
 public class SigmaTool extends ReportScanningTool {
-    private static final String TOOL_ID = "synopsys-sigma-issues-tool";
-    private static final String DEFAULT_FILE_PATTERN = "**/sigma-results.json";
+    public static final String TOOL_ID = "synopsys-sigma-issues-tool";
+    public static final String DEFAULT_FILE_PATTERN = "**/sigma-results.json";
 
     @DataBoundConstructor
     public SigmaTool() {

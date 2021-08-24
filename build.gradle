@@ -20,15 +20,16 @@ jenkinsPlugin {
     //url = 'https://wiki.jenkins.io/display/JENKINS/Synopsys+Coverity+Plugin'
     //gitHubUrl = 'https://github.com/jenkinsci/synopsys-coverity-plugin'
 
-    compatibleSinceVersion = '2.0.0'
     pluginFirstClassLoader = false
 }
 
 dependencies {
     implementation 'org.jenkins-ci.plugins:credentials:2.1.10'
+    implementation 'org.jenkins-ci.plugins:matrix-project:1.18'
     implementation 'io.jenkins.plugins:warnings-ng:9.4.0'
 
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:2.18.3'
 }
 
 task renameFile {

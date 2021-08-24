@@ -56,7 +56,7 @@ public class SigmaToolInstallation extends ToolInstallation implements Environme
         }
 
         @Override
-        public String call() throws IOException {
+        public String call() {
             String execName = (Functions.isWindows()) ? WINDOWS_SIGMA_COMMAND : UNIX_SIGMA_COMMAND;
             File exe = new File(sigmaHome, execName);
             if (exe.exists()) {
@@ -67,7 +67,7 @@ public class SigmaToolInstallation extends ToolInstallation implements Environme
     }
 
     @Extension
-    @Symbol("sigma")
+    @Symbol("sigmaTool")
     public static final class DescriptorImpl extends ToolDescriptor<SigmaToolInstallation> {
 
         @Override
