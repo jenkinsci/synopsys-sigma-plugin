@@ -12,29 +12,12 @@
         </j:otherwise>
       </j:choose>
     </f:entry>
+    <f:entry field="ignorePolicies" title="${%ignorePoliciesTitle}">
+        <f:checkbox/>
+    </f:entry>
     <f:advanced>
-        <f:section title="${%sectionHeadingPolicy}">
-            <f:block>
-                <f:entry field="policyFilePath" title="${%policyFilePathTitle}">
-                    <f:textbox/>
-                </f:entry>
-            </f:block>
-        </f:section>
-        <f:section title="${%sectionHeadingConfig}">
-            <f:block>
-                <f:repeatableHeteroProperty field="configFileEntries" hasHeader="true"/>
-            </f:block>
-        </f:section>
-
-        <f:section title="${%sectionHeadingAdditionalArguments}">
-            <f:block>
-                <f:repeatableHeteroProperty field="additionalAnalyzeArguments" hasHeader="true"/>
-            </f:block>
-        </f:section>
-        <f:section title="${%sectionHeadingDirectories}">
-            <f:block>
-                <f:repeatableHeteroProperty field="analyzeDirectories" hasHeader="true"/>
-            </f:block>
-        </f:section>
+        <f:entry field="commandLine" title="${%commandLineTitle}">
+            <f:textbox/>
+        </f:entry>
     </f:advanced>
 </j:jelly>
