@@ -56,7 +56,9 @@ public class SigmaTestUtil extends TestWatcher {
     public void addInstallation(Supplier<SigmaToolInstallation.DescriptorImpl> sigmaToolSupplier) throws IOException {
         String downloadUrl = getDownloadUrl();
         int timeout = getTimeoutInSeconds();
-        SigmaBinaryInstaller sigmaBinaryInstaller = new SigmaBinaryInstaller("", downloadUrl, timeout);
+        SigmaBinaryInstaller sigmaBinaryInstaller = new SigmaBinaryInstaller("");
+        sigmaBinaryInstaller.setDownloadUrl(downloadUrl);
+        sigmaBinaryInstaller.setTimeout(timeout);
         InstallSourceProperty installSourceProperty = new InstallSourceProperty(Collections.singletonList(sigmaBinaryInstaller));
         List<InstallSourceProperty> propertySet = Collections.singletonList(installSourceProperty);
         SigmaToolInstallation installation = new SigmaToolInstallation(TEST_TOOL_NAME, TEST_TOOL_HOME, propertySet);

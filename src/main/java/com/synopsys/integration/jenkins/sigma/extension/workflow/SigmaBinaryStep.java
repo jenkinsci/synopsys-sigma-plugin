@@ -26,6 +26,8 @@ import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Node;
 import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
@@ -72,29 +74,35 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
     }
 
     @Override
+    public void perform(Run<?, ?> run, FilePath workspace, EnvVars environment, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
+        listener.getLogger().println("Executing Sigma binary Build Step.");
+        try {
+            if (Result.ABORTED.equals(run.getResult())) {
+                throw new AbortException(FAILURE_MESSAGE + "The build was aborted.");
+            }
+            Optional<SigmaToolInstallation> sigmaToolInstallation = getSigma(workspace.toComputer().getNode(), environment, listener);
+            execute(run, workspace, environment, launcher, listener, sigmaToolInstallation.orElse(null));
+        } catch (final Exception ex) {
+            listener.error("[ERROR] " + ex.getMessage());
+            ex.printStackTrace(listener.fatalError(FAILURE_MESSAGE + "sigma command execution failed."));
+            run.setResult(Result.UNSTABLE);
+        }
+    }
+
+    @Override
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
         listener.getLogger().println("Executing Sigma binary Build Step.");
         try {
             if (Result.ABORTED.equals(build.getResult())) {
                 throw new AbortException(FAILURE_MESSAGE + "The build was aborted.");
             }
+            Node node = Optional.ofNullable(build.getBuiltOn()).orElseThrow(() -> new AbortException(FAILURE_MESSAGE + "Could not access node."));
+            VirtualChannel virtualChannel = Optional.ofNullable(node.getChannel()).orElseThrow(() -> new AbortException(FAILURE_MESSAGE + "Configured node \"" + node.getDisplayName() + "\" is either not connected or offline."));
 
-            SigmaBuildContext sigmaBuildContext = createBuildContext(build, launcher, listener);
-            Node node = sigmaBuildContext.getNode().orElseThrow(() -> new AbortException(FAILURE_MESSAGE + "Could not access node."));
-            sigmaBuildContext.getVirtualChannel().orElseThrow(() -> new AbortException(FAILURE_MESSAGE + "Configured node \"" + node.getDisplayName() + "\" is either not connected or offline."));
-
-            FilePath workingDirectory = getWorkingDirectory(build, sigmaBuildContext);
-            CommandLineBuilder commandLineBuilder = new CommandLineBuilder(sigmaBuildContext, getSigma().orElse(null), ignorePolicies, commandLine);
-            ArgumentListBuilder argumentListBuilder = commandLineBuilder.buildArgumentList();
-
-            Result result = executeSigma(sigmaBuildContext, argumentListBuilder, workingDirectory);
-            if (result == Result.SUCCESS) {
-                return true;
-            }
-        } catch (final InterruptedException e) {
-            listener.error("[ERROR] Synopsys Sigma thread was interrupted.", e);
-            build.setResult(Result.ABORTED);
-            Thread.currentThread().interrupt();
+            FilePath workingDirectory = getWorkingDirectory(build, virtualChannel);
+            EnvVars environment = build.getEnvironment(listener);
+            Optional<SigmaToolInstallation> sigmaToolInstallation = getSigma(node, environment, listener);
+            return execute(build, workingDirectory, environment, launcher, listener, sigmaToolInstallation.orElse(null));
         } catch (final Exception ex) {
             listener.error("[ERROR] " + ex.getMessage());
             ex.printStackTrace(listener.fatalError(FAILURE_MESSAGE + "sigma command execution failed."));
@@ -103,22 +111,37 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
         return false;
     }
 
-    private SigmaBuildContext createBuildContext(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-        Node node = build.getBuiltOn();
-        VirtualChannel virtualChannel = null;
-        if (node != null) {
-            virtualChannel = node.getChannel();
+    private boolean execute(Run<?, ?> run, FilePath workingDirectory, EnvVars environment, Launcher launcher, TaskListener listener, SigmaToolInstallation sigmaToolInstallation) {
+        try {
+            SigmaBuildContext sigmaBuildContext = createBuildContext(environment, launcher, listener, sigmaToolInstallation);
+            CommandLineBuilder commandLineBuilder = new CommandLineBuilder(sigmaBuildContext, ignorePolicies, commandLine);
+            ArgumentListBuilder argumentListBuilder = commandLineBuilder.buildArgumentList();
+
+            Result result = executeSigma(sigmaBuildContext, argumentListBuilder, workingDirectory);
+            if (result == Result.SUCCESS) {
+                return true;
+            }
+        } catch (final InterruptedException e) {
+            listener.error("[ERROR] Synopsys Sigma thread was interrupted.", e);
+            run.setResult(Result.ABORTED);
+            Thread.currentThread().interrupt();
+        } catch (final Exception ex) {
+            listener.error("[ERROR] " + ex.getMessage());
+            ex.printStackTrace(listener.fatalError(FAILURE_MESSAGE + "sigma command execution failed."));
+            run.setResult(Result.UNSTABLE);
         }
-        EnvVars environment = build.getEnvironment(listener);
-        return new SigmaBuildContext(launcher, listener, node, virtualChannel, environment);
+        return false;
     }
 
-    private FilePath getWorkingDirectory(final AbstractBuild<?, ?> build, SigmaBuildContext sigmaBuildContext) throws AbortException {
+    private SigmaBuildContext createBuildContext(EnvVars environment, Launcher launcher, TaskListener listener, SigmaToolInstallation sigmaToolInstallation) throws IOException, InterruptedException {
+        return new SigmaBuildContext(launcher, listener, environment, sigmaToolInstallation);
+    }
+
+    private FilePath getWorkingDirectory(final AbstractBuild<?, ?> build, VirtualChannel virtualChannel) throws AbortException {
         FilePath workingDirectory;
         if (build.getWorkspace() == null) {
-            Optional<VirtualChannel> virtualChannel = sigmaBuildContext.getVirtualChannel();
-            if (virtualChannel.isPresent()) {
-                workingDirectory = new FilePath(virtualChannel.get(), build.getProject().getCustomWorkspace());
+            if (virtualChannel != null) {
+                workingDirectory = new FilePath(virtualChannel, build.getProject().getCustomWorkspace());
             } else {
                 throw new AbortException(FAILURE_MESSAGE + "Could not determine working directory");
             }
@@ -149,9 +172,19 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
         return Result.SUCCESS;
     }
 
-    private Optional<SigmaToolInstallation> getSigma() {
+    private Optional<SigmaToolInstallation> getSigma(Node node, EnvVars environment, TaskListener listener) throws IOException, InterruptedException {
         Predicate<SigmaToolInstallation> sigmaToolFilter = (installation) -> sigmaToolName != null && sigmaToolName.equals(installation.getName());
-        return Arrays.stream(getDescriptor().getInstallations()).filter(sigmaToolFilter).findFirst();
+        Optional<SigmaToolInstallation> sigmaToolInstallation = Arrays.stream(getDescriptor().getInstallations()).filter(sigmaToolFilter).findFirst();
+        SigmaToolInstallation currentTool = null;
+        if (sigmaToolInstallation.isPresent()) {
+            currentTool = sigmaToolInstallation.get();
+            if (node != null) {
+                currentTool = currentTool.forNode(node, listener);
+            }
+            currentTool = currentTool.forEnvironment(environment);
+        }
+
+        return Optional.ofNullable(currentTool);
     }
 
     @Override

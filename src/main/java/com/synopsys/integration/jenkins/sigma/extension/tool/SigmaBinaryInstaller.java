@@ -7,7 +7,7 @@ import java.net.URL;
 import javax.servlet.ServletException;
 
 import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 import com.synopsys.integration.jenkins.sigma.Messages;
@@ -25,24 +25,29 @@ import hudson.util.FormValidation;
 
 public class SigmaBinaryInstaller extends ToolInstaller {
     public static final int DEFAULT_TIMEOUT_SECONDS = 30;
-    private final String downloadUrl;
-    private final int timeout;
+    private String downloadUrl;
+    private int timeout;
 
-    @DataBoundConstructor
-    public SigmaBinaryInstaller(String label, String downloadUrl, int timeout) {
+    public SigmaBinaryInstaller(String label) {
         super(label);
-        this.downloadUrl = downloadUrl;
-        this.timeout = timeout;
     }
 
-    @SuppressWarnings("unused")
     public String getDownloadUrl() {
         return downloadUrl;
     }
 
-    @SuppressWarnings("unused")
+    @DataBoundSetter
+    public void setDownloadUrl(final String downloadUrl) {
+        this.downloadUrl = downloadUrl;
+    }
+
     public int getTimeout() {
         return timeout;
+    }
+
+    @DataBoundSetter
+    public void setTimeout(final int timeout) {
+        this.timeout = timeout;
     }
 
     @Override

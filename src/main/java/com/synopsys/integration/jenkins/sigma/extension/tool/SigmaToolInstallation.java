@@ -1,10 +1,10 @@
 package com.synopsys.integration.jenkins.sigma.extension.tool;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -14,7 +14,7 @@ import com.synopsys.integration.jenkins.sigma.extension.workflow.SigmaBinaryStep
 
 import hudson.EnvVars;
 import hudson.Extension;
-import hudson.Functions;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.EnvironmentSpecific;
 import hudson.model.Node;
@@ -25,7 +25,6 @@ import hudson.tools.ToolInstallation;
 import hudson.tools.ToolInstaller;
 import hudson.tools.ToolProperty;
 import jenkins.model.Jenkins;
-import jenkins.security.MasterToSlaveCallable;
 
 public class SigmaToolInstallation extends ToolInstallation implements EnvironmentSpecific<SigmaToolInstallation>, NodeSpecific<SigmaToolInstallation>, Serializable {
     public static final String UNIX_SIGMA_COMMAND = "sigma";
@@ -44,26 +43,21 @@ public class SigmaToolInstallation extends ToolInstallation implements Environme
         return new SigmaToolInstallation(getName(), translateFor(node, log), getProperties().toList());
     }
 
-    public String getExecutablePath(Launcher launcher) throws IOException, InterruptedException {
-        return launcher.getChannel().call(new GetExecutablePath(getHome()));
-    }
-
-    private static final class GetExecutablePath extends MasterToSlaveCallable<String, IOException> {
-        private final String sigmaHome;
-
-        public GetExecutablePath(String sigmaHome) {
-            this.sigmaHome = sigmaHome;
-        }
-
-        @Override
-        public String call() {
-            String execName = (Functions.isWindows()) ? WINDOWS_SIGMA_COMMAND : UNIX_SIGMA_COMMAND;
-            File exe = new File(sigmaHome, execName);
-            if (exe.exists()) {
-                return exe.getPath();
+    public Optional<String> getExecutablePath(Launcher launcher, TaskListener listener) {
+        FilePath homeFilePath = new FilePath(launcher.getChannel(), getHome());
+        String execName = launcher.isUnix() ? UNIX_SIGMA_COMMAND : WINDOWS_SIGMA_COMMAND;
+        FilePath executableFilePath = homeFilePath.child(execName);
+        try {
+            if (executableFilePath.exists()) {
+                return Optional.of(executableFilePath.getRemote());
             }
-            return null;
+        } catch (IOException ex) {
+            listener.error("Error getting tool installation path %s", ex.getMessage());
+        } catch (InterruptedException ex) {
+            listener.error("Error getting tool installation path %s", ex.getMessage());
+            Thread.currentThread().interrupt();
         }
+        return Optional.empty();
     }
 
     @Extension
@@ -77,7 +71,9 @@ public class SigmaToolInstallation extends ToolInstallation implements Environme
 
         @Override
         public List<? extends ToolInstaller> getDefaultInstallers() {
-            return Collections.singletonList(new SigmaBinaryInstaller(null, null, SigmaBinaryInstaller.DEFAULT_TIMEOUT_SECONDS));
+            SigmaBinaryInstaller installer = new SigmaBinaryInstaller(null);
+            installer.setTimeout(SigmaBinaryInstaller.DEFAULT_TIMEOUT_SECONDS);
+            return Collections.singletonList(installer);
         }
 
         @Override

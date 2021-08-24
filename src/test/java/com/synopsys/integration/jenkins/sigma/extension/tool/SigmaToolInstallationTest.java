@@ -1,13 +1,13 @@
 package com.synopsys.integration.jenkins.sigma.extension.tool;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -16,9 +16,10 @@ import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import com.synopsys.integration.jenkins.sigma.Messages;
-import com.synopsys.integration.jenkins.sigma.utils.CreateFilePathOnNode;
 
+import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.TaskListener;
 
 public class SigmaToolInstallationTest {
     private static final String HOME_DIRECTORY = "build/tmp/test/home";
@@ -45,18 +46,22 @@ public class SigmaToolInstallationTest {
     public void testExecutablePathNull() throws IOException, InterruptedException {
         SigmaToolInstallation installation = new SigmaToolInstallation("sigma-test", HOME_DIRECTORY, Collections.emptyList());
         Launcher launcher = jenkinsRule.createLocalLauncher();
-        String path = installation.getExecutablePath(launcher);
-        assertNull(path);
+        TaskListener listener = jenkinsRule.createTaskListener();
+        Optional<String> path = installation.getExecutablePath(launcher, listener);
+        assertFalse(path.isPresent());
     }
 
     @Test
     public void testExecutablePath() throws IOException, InterruptedException {
         SigmaToolInstallation installation = new SigmaToolInstallation("sigma-test", HOME_DIRECTORY, Collections.emptyList());
-        Launcher launcher = jenkinsRule.createLocalLauncher();
         String excutablePath = HOME_DIRECTORY + "/" + SigmaToolInstallation.UNIX_SIGMA_COMMAND;
-        launcher.getChannel().call(new CreateFilePathOnNode(excutablePath));
-        String path = installation.getExecutablePath(launcher);
-        assertNotNull(path);
-        assertTrue(path.contains(excutablePath));
+        FilePath createExecutable = new FilePath(new File(excutablePath));
+        Launcher fileLauncher = createExecutable.createLauncher(jenkinsRule.createTaskListener());
+        TaskListener listener = jenkinsRule.createTaskListener();
+        createExecutable.mkdirs();
+        createExecutable.touch(System.currentTimeMillis());
+        Optional<String> path = installation.getExecutablePath(fileLauncher, listener);
+        assertTrue(path.isPresent());
+        assertTrue(path.get().contains(excutablePath));
     }
 }

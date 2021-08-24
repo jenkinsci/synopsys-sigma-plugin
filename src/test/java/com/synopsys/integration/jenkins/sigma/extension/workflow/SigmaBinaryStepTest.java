@@ -33,18 +33,22 @@ public class SigmaBinaryStepTest {
     @Test
     public void testStepFields() {
         SigmaBinaryStep step = new SigmaBinaryStep();
-        SigmaToolInstallation toolInstallation = new SigmaToolInstallation("sigma-test", "home", Collections.emptyList());
         step.setSigmaToolName("sigma-test");
         step.setIgnorePolicies(false);
         step.setCommandLine("analyze");
-        step.getDescriptor().setInstallations(toolInstallation);
-        ListBoxModel toolOptions = step.getDescriptor().doFillSigmaToolNameItems();
-        assertEquals(step.getDescriptor().getToolDescriptor(), toolInstallation.getDescriptor());
         assertEquals("sigma-test", step.getSigmaToolName());
         assertEquals("analyze", step.getCommandLine());
         assertFalse(step.isIgnorePolicies());
-        assertTrue(step.getDescriptor().hasToolsConfigured());
+    }
+
+    @Test
+    public void testDescriptor() {
+        SigmaBinaryStep.DescriptorImpl descriptor = new SigmaBinaryStep.DescriptorImpl();
+        SigmaToolInstallation toolInstallation = new SigmaToolInstallation("sigma-test", "home", Collections.emptyList());
+        descriptor.setInstallations(toolInstallation);
+        ListBoxModel toolOptions = descriptor.doFillSigmaToolNameItems();
         assertFalse(toolOptions.isEmpty());
+        assertTrue(descriptor.hasToolsConfigured());
     }
 
     @Test

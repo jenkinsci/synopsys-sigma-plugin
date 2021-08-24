@@ -38,10 +38,12 @@ public class SigmaBinaryInstallerTest {
         String label = "sigma-test";
         String downloadUrl = "downloadUrl";
         int timeout = 60;
-        SigmaBinaryInstaller sigmaBinaryInstaller = new SigmaBinaryInstaller(label, downloadUrl, timeout);
-        assertEquals(label, sigmaBinaryInstaller.getLabel());
-        assertEquals(downloadUrl, sigmaBinaryInstaller.getDownloadUrl());
-        assertEquals(timeout, sigmaBinaryInstaller.getTimeout());
+        SigmaBinaryInstaller installer = new SigmaBinaryInstaller(label);
+        installer.setDownloadUrl(downloadUrl);
+        installer.setTimeout(timeout);
+        assertEquals(label, installer.getLabel());
+        assertEquals(downloadUrl, installer.getDownloadUrl());
+        assertEquals(timeout, installer.getTimeout());
     }
 
     @Test
@@ -49,9 +51,11 @@ public class SigmaBinaryInstallerTest {
         String label = "sigma-test";
         String downloadUrl = "downloadUrl";
         int timeout = 60;
-        SigmaBinaryInstaller sigmaBinaryInstaller = new SigmaBinaryInstaller(label, downloadUrl, timeout);
-        assertEquals(Messages.installer_displayName(), sigmaBinaryInstaller.getDescriptor().getDisplayName());
-        assertTrue(sigmaBinaryInstaller.getDescriptor().isApplicable(SigmaToolInstallation.class));
+        SigmaBinaryInstaller installer = new SigmaBinaryInstaller(label);
+        installer.setDownloadUrl(downloadUrl);
+        installer.setTimeout(timeout);
+        assertEquals(Messages.installer_displayName(), installer.getDescriptor().getDisplayName());
+        assertTrue(installer.getDescriptor().isApplicable(SigmaToolInstallation.class));
     }
 
     @Test
@@ -59,8 +63,10 @@ public class SigmaBinaryInstallerTest {
         String label = "sigma-test";
         String downloadUrl = "downloadUrl";
         int timeout = 60;
-        SigmaBinaryInstaller sigmaBinaryInstaller = new SigmaBinaryInstaller(label, downloadUrl, timeout);
-        assertFalse(sigmaBinaryInstaller.getDescriptor().isApplicable(Maven.MavenInstallation.class));
+        SigmaBinaryInstaller installer = new SigmaBinaryInstaller(label);
+        installer.setDownloadUrl(downloadUrl);
+        installer.setTimeout(timeout);
+        assertFalse(installer.getDescriptor().isApplicable(Maven.MavenInstallation.class));
     }
 
     @Test
@@ -68,8 +74,10 @@ public class SigmaBinaryInstallerTest {
         String label = "sigma-test";
         String downloadUrl = "      \t\n";
         int timeout = 60;
-        SigmaBinaryInstaller sigmaBinaryInstaller = new SigmaBinaryInstaller(label, downloadUrl, timeout);
-        assertTrue(sigmaBinaryInstaller.getDescriptor().doCheckDownloadUrl(downloadUrl).kind == FormValidation.Kind.ERROR);
+        SigmaBinaryInstaller installer = new SigmaBinaryInstaller(label);
+        installer.setDownloadUrl(downloadUrl);
+        installer.setTimeout(timeout);
+        assertTrue(installer.getDescriptor().doCheckDownloadUrl(downloadUrl).kind == FormValidation.Kind.ERROR);
     }
 
     @Test
@@ -77,8 +85,10 @@ public class SigmaBinaryInstallerTest {
         String label = "sigma-test";
         String downloadUrl = null;
         int timeout = 60;
-        SigmaBinaryInstaller sigmaBinaryInstaller = new SigmaBinaryInstaller(label, downloadUrl, timeout);
-        assertTrue(sigmaBinaryInstaller.getDescriptor().doCheckDownloadUrl(downloadUrl).kind == FormValidation.Kind.ERROR);
+        SigmaBinaryInstaller installer = new SigmaBinaryInstaller(label);
+        installer.setDownloadUrl(downloadUrl);
+        installer.setTimeout(timeout);
+        assertTrue(installer.getDescriptor().doCheckDownloadUrl(downloadUrl).kind == FormValidation.Kind.ERROR);
     }
 
     @Test
@@ -86,8 +96,10 @@ public class SigmaBinaryInstallerTest {
         String label = "sigma-test";
         String downloadUrl = "htp:a_bad_url.example.com?443";
         int timeout = 60;
-        SigmaBinaryInstaller sigmaBinaryInstaller = new SigmaBinaryInstaller(label, downloadUrl, timeout);
-        assertTrue(sigmaBinaryInstaller.getDescriptor().doCheckDownloadUrl(downloadUrl).kind == FormValidation.Kind.ERROR);
+        SigmaBinaryInstaller installer = new SigmaBinaryInstaller(label);
+        installer.setDownloadUrl(downloadUrl);
+        installer.setTimeout(timeout);
+        assertTrue(installer.getDescriptor().doCheckDownloadUrl(downloadUrl).kind == FormValidation.Kind.ERROR);
     }
 
     @Test
@@ -95,8 +107,10 @@ public class SigmaBinaryInstallerTest {
         String label = "sigma-test";
         String downloadUrl = "https://www.synopsys.com/";
         int timeout = 60;
-        SigmaBinaryInstaller sigmaBinaryInstaller = new SigmaBinaryInstaller(label, downloadUrl, timeout);
-        assertTrue(sigmaBinaryInstaller.getDescriptor().doCheckDownloadUrl(downloadUrl).kind == FormValidation.Kind.OK);
+        SigmaBinaryInstaller installer = new SigmaBinaryInstaller(label);
+        installer.setDownloadUrl(downloadUrl);
+        installer.setTimeout(timeout);
+        assertTrue(installer.getDescriptor().doCheckDownloadUrl(downloadUrl).kind == FormValidation.Kind.OK);
     }
 
     @Test
@@ -111,7 +125,9 @@ public class SigmaBinaryInstallerTest {
 
         Mockito.when(node.getRootPath()).thenReturn(new FilePath(new File(".")));
         Mockito.when(node.getDisplayName()).thenReturn("sigma-test-node");
-        SigmaBinaryInstaller installer = new SigmaBinaryInstaller(label, downloadUrl, timeout);
+        SigmaBinaryInstaller installer = new SigmaBinaryInstaller(label);
+        installer.setDownloadUrl(downloadUrl);
+        installer.setTimeout(timeout);
         try {
             installer.performInstallation(toolInstallation, node, log);
             fail("Installer didn't throw abort exception when channel is expected to be null.");
