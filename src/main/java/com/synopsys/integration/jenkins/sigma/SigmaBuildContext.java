@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2021 Synopsys, Inc. All rights reserved worldwide.
+ */
 package com.synopsys.integration.jenkins.sigma;
 
 import java.util.Optional;
