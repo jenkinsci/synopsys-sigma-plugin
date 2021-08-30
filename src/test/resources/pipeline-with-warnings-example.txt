@@ -1,0 +1,5 @@
+node {
+     tool name: 'sigma-test', type: 'sigmaTool'
+     sigma commandLine: '', ignorePolicies: true, sigmaToolName: 'sigma-test'
+     recordIssues(tools: [[$class: 'SigmaTool']])
+}

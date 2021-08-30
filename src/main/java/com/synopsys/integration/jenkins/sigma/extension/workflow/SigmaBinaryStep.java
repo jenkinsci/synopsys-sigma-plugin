@@ -118,9 +118,8 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
             ArgumentListBuilder argumentListBuilder = commandLineBuilder.buildArgumentList();
 
             Result result = executeSigma(sigmaBuildContext, argumentListBuilder, workingDirectory);
-            if (result == Result.SUCCESS) {
-                return true;
-            }
+            run.setResult(result);
+            return result == Result.SUCCESS;
         } catch (final InterruptedException e) {
             listener.error("[ERROR] Synopsys Sigma thread was interrupted.", e);
             run.setResult(Result.ABORTED);

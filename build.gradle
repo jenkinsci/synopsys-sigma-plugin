@@ -28,6 +28,10 @@ dependencies {
     implementation 'org.jenkins-ci.plugins:matrix-project:1.18'
     implementation 'io.jenkins.plugins:warnings-ng:9.4.0'
 
+    testImplementation 'org.jenkins-ci.plugins.workflow:workflow-basic-steps:2.22'
+    testImplementation 'org.jenkins-ci.plugins.workflow:workflow-cps:2.93'
+    testImplementation 'org.jenkins-ci.plugins.workflow:workflow-durable-task-step:1.37'
+    testImplementation 'org.jenkins-ci.plugins.workflow:workflow-job:2.41'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:2.18.3'
 }

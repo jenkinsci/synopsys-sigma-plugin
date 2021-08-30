@@ -12,17 +12,23 @@ import java.util.Collections;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import com.synopsys.integration.jenkins.sigma.extension.tool.SigmaToolInstallation;
 
+import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Node;
 import hudson.model.Result;
+import hudson.model.Run;
 import hudson.model.StreamBuildListener;
+import hudson.model.TaskListener;
+import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.util.ListBoxModel;
+import hudson.util.StreamTaskListener;
 
 public class SigmaBinaryStepTest {
     // this isn't used in this class but the getDescriptor method internally calls Jenkins.getInstance().
@@ -49,6 +55,7 @@ public class SigmaBinaryStepTest {
         ListBoxModel toolOptions = descriptor.doFillSigmaToolNameItems();
         assertFalse(toolOptions.isEmpty());
         assertTrue(descriptor.hasToolsConfigured());
+        assertEquals(toolInstallation.getDescriptor(), descriptor.getToolDescriptor());
     }
 
     @Test
@@ -106,5 +113,26 @@ public class SigmaBinaryStepTest {
         boolean result = step.perform(build, launcher, buildListener);
         assertNull(build.getBuiltOn().getChannel());
         assertFalse(result);
+    }
+
+    @Test
+    public void testPipelinePreviousBuildResult() throws IOException, InterruptedException {
+        SigmaBinaryStep step = new SigmaBinaryStep();
+        SigmaToolInstallation toolInstallation = new SigmaToolInstallation("sigma-test", "home", Collections.emptyList());
+        step.setSigmaToolName("sigma-test");
+        step.setIgnorePolicies(false);
+        step.getDescriptor().setInstallations(toolInstallation);
+        Run<?, ?> run = Mockito.mock(Run.class);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        TaskListener taskListener = new StreamTaskListener(byteArrayOutputStream);
+        Launcher launcher = new Launcher.LocalLauncher(taskListener);
+        EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
+        EnvVars environment = prop.getEnvVars();
+
+        ArgumentCaptor<Result> buildResultCaptor = ArgumentCaptor.forClass(Result.class);
+        Mockito.when(run.getResult()).thenReturn(Result.ABORTED);
+        Mockito.doNothing().when(run).setResult(buildResultCaptor.capture());
+        step.perform(run, null, environment, launcher, taskListener);
+        assertEquals(Result.UNSTABLE, buildResultCaptor.getValue());
     }
 }

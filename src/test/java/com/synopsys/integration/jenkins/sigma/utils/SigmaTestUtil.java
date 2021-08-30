@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +77,17 @@ public class SigmaTestUtil extends TestWatcher {
             e.printStackTrace();
         }
         return Optional.empty();
+    }
+
+    public String readPipelineScript(String resourcePath) {
+        String pipelineScript = "";
+        try {
+            File resourceFile = new File(getClass().getClassLoader().getResource(resourcePath).toURI());
+            pipelineScript = FileUtils.readFileToString(resourceFile, StandardCharsets.UTF_8);
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return pipelineScript;
     }
 
 }

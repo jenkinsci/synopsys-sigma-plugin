@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,5 +57,31 @@ public class SigmaBinaryStepIntegrationTest {
         assertTrue(step.getDescriptor().isApplicable(FreeStyleProject.class));
         jenkinsRule.buildAndAssertSuccess(project);
 
+    }
+
+    @Test
+    public void testPipelineBuildStepSucceeds() throws Exception {
+        sigmaTestUtil.addInstallation(() -> jenkinsRule.jenkins.getDescriptorByType(SigmaToolInstallation.DescriptorImpl.class));
+        String script = sigmaTestUtil.readPipelineScript("pipeline-example.txt");
+        WorkflowJob project = jenkinsRule.createProject(WorkflowJob.class, "Test Pipeline Project");
+        CpsFlowDefinition pipelineDefinition = new CpsFlowDefinition(script, true);
+        project.setDefinition(pipelineDefinition);
+        SigmaBinaryStep step = new SigmaBinaryStep();
+        step.setSigmaToolName(SigmaTestUtil.TEST_TOOL_NAME);
+        assertNotNull(step.getDescriptor().getInstallations());
+        jenkinsRule.buildAndAssertSuccess(project);
+    }
+
+    @Test
+    public void testPipelineBuildStepWithWarningsPluginSucceeds() throws Exception {
+        sigmaTestUtil.addInstallation(() -> jenkinsRule.jenkins.getDescriptorByType(SigmaToolInstallation.DescriptorImpl.class));
+        String script = sigmaTestUtil.readPipelineScript("pipeline-with-warnings-example.txt");
+        WorkflowJob project = jenkinsRule.createProject(WorkflowJob.class, "Test Pipeline with Warnings Project");
+        CpsFlowDefinition pipelineDefinition = new CpsFlowDefinition(script, true);
+        project.setDefinition(pipelineDefinition);
+        SigmaBinaryStep step = new SigmaBinaryStep();
+        step.setSigmaToolName(SigmaTestUtil.TEST_TOOL_NAME);
+        assertNotNull(step.getDescriptor().getInstallations());
+        jenkinsRule.buildAndAssertSuccess(project);
     }
 }
