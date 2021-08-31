@@ -85,6 +85,10 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
             }
             Optional<SigmaToolInstallation> sigmaToolInstallation = getSigma(workspace.toComputer().getNode(), environment, listener);
             execute(run, workspace, environment, launcher, listener, sigmaToolInstallation.orElse(null));
+        } catch (final InterruptedException e) {
+            listener.error("[ERROR] Synopsys Sigma thread was interrupted.", e);
+            run.setResult(Result.ABORTED);
+            Thread.currentThread().interrupt();
         } catch (final Exception ex) {
             listener.error("[ERROR] " + ex.getMessage());
             ex.printStackTrace(listener.fatalError(FAILURE_MESSAGE + "sigma command execution failed."));
@@ -106,6 +110,10 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
             EnvVars environment = build.getEnvironment(listener);
             Optional<SigmaToolInstallation> sigmaToolInstallation = getSigma(node, environment, listener);
             return execute(build, workingDirectory, environment, launcher, listener, sigmaToolInstallation.orElse(null));
+        } catch (final InterruptedException e) {
+            listener.error("[ERROR] Synopsys Sigma thread was interrupted.", e);
+            build.setResult(Result.ABORTED);
+            Thread.currentThread().interrupt();
         } catch (final Exception ex) {
             listener.error("[ERROR] " + ex.getMessage());
             ex.printStackTrace(listener.fatalError(FAILURE_MESSAGE + "sigma command execution failed."));
@@ -114,25 +122,14 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
         return false;
     }
 
-    private boolean execute(Run<?, ?> run, FilePath workingDirectory, EnvVars environment, Launcher launcher, TaskListener listener, SigmaToolInstallation sigmaToolInstallation) {
-        try {
-            SigmaBuildContext sigmaBuildContext = createBuildContext(environment, launcher, listener, sigmaToolInstallation);
-            CommandLineBuilder commandLineBuilder = new CommandLineBuilder(sigmaBuildContext, ignorePolicies, commandLine);
-            ArgumentListBuilder argumentListBuilder = commandLineBuilder.buildArgumentList();
+    private boolean execute(Run<?, ?> run, FilePath workingDirectory, EnvVars environment, Launcher launcher, TaskListener listener, SigmaToolInstallation sigmaToolInstallation) throws IOException, InterruptedException {
+        SigmaBuildContext sigmaBuildContext = createBuildContext(environment, launcher, listener, sigmaToolInstallation);
+        CommandLineBuilder commandLineBuilder = new CommandLineBuilder(sigmaBuildContext, ignorePolicies, commandLine);
+        ArgumentListBuilder argumentListBuilder = commandLineBuilder.buildArgumentList();
 
-            Result result = executeSigma(sigmaBuildContext, argumentListBuilder, workingDirectory);
-            run.setResult(result);
-            return result == Result.SUCCESS;
-        } catch (final InterruptedException e) {
-            listener.error("[ERROR] Synopsys Sigma thread was interrupted.", e);
-            run.setResult(Result.ABORTED);
-            Thread.currentThread().interrupt();
-        } catch (final Exception ex) {
-            listener.error("[ERROR] " + ex.getMessage());
-            ex.printStackTrace(listener.fatalError(FAILURE_MESSAGE + "sigma command execution failed."));
-            run.setResult(Result.UNSTABLE);
-        }
-        return false;
+        Result result = executeSigma(sigmaBuildContext, argumentListBuilder, workingDirectory);
+        run.setResult(result);
+        return result == Result.SUCCESS;
     }
 
     private SigmaBuildContext createBuildContext(EnvVars environment, Launcher launcher, TaskListener listener, SigmaToolInstallation sigmaToolInstallation) throws IOException, InterruptedException {

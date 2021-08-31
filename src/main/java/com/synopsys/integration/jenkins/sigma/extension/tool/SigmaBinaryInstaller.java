@@ -10,6 +10,7 @@ import java.net.URL;
 import javax.servlet.ServletException;
 
 import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -31,6 +32,7 @@ public class SigmaBinaryInstaller extends ToolInstaller {
     private String downloadUrl;
     private int timeout;
 
+    @DataBoundConstructor
     public SigmaBinaryInstaller(String label) {
         super(label);
     }
