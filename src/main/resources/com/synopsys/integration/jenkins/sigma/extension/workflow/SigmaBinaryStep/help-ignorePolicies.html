@@ -1,12 +1,5 @@
 <div>
-    <p>
-        Ignore any policy violations Sigma has detected if the analyze sub-command is present.
-        This is important in order to always report the issues Sigma has found in Jenkins.
-        <br />
-        If there are policy violations, then Sigma will return a non-zero exit code which will cause Jenkins to fail the build.
-        If the build fails due to Sigma policy violations, then the recording of issues Sigma found will not be performed for that build.
-        <br />
-        If you wish to fail the build due to policy violations, then do not select this option.
+    <p> Prevents Sigma from failing the build based on violated policies.
         <br />
         If selected, then the '--ignore-policies' command line argument will be added to the Sigma analyze sub-command.
     </p>
