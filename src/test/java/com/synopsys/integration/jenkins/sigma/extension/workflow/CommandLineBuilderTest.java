@@ -24,7 +24,6 @@ public class CommandLineBuilderTest {
 
     @Test
     public void testDefaultCommandLineUnix() throws Exception {
-        VirtualChannel virtualChannel = Mockito.mock(VirtualChannel.class);
         Launcher launcher = Mockito.mock(Launcher.class);
         BuildListener listener = Mockito.mock(BuildListener.class);
 

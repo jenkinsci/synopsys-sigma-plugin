@@ -13,7 +13,7 @@
       </j:choose>
     </f:entry>
     <f:entry field="ignorePolicies" title="${%ignorePoliciesTitle}">
-        <f:checkbox/>
+        <f:checkbox default="true"/>
     </f:entry>
     <f:advanced>
         <f:entry field="commandLine" title="${%commandLineTitle}">
