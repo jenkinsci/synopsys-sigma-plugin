@@ -57,7 +57,7 @@ public class CommandLineBuilder {
                 logger.println(String.format("Adding %s to command line", COMMAND_TOKEN_IGNORE_POLICIES));
                 int insertIndex = analyzeIndex + COMMAND_TOKEN_ANALYZE.length() + 1;
                 StringBuilder commandBuilder = new StringBuilder(currentCommandLine);
-                // add the 'ignore-policies' command argument with space before and after it.
+                // add the commandFlag command line argument with space before and after it.
                 commandBuilder.insert(insertIndex, String.format(" %s ", COMMAND_TOKEN_IGNORE_POLICIES));
                 updatedCommandLine = commandBuilder.toString();
             } else {

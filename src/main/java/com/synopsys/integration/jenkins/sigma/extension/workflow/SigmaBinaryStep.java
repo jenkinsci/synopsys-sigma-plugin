@@ -47,7 +47,9 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
     private boolean ignorePolicies;
 
     @DataBoundConstructor
-    public SigmaBinaryStep() {}
+    public SigmaBinaryStep() {
+        this.ignorePolicies = true;
+    }
 
     public String getSigmaToolName() {
         return sigmaToolName;
