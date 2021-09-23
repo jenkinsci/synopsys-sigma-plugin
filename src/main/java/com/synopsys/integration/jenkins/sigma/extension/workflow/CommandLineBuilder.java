@@ -74,7 +74,7 @@ public class CommandLineBuilder {
         Optional<SigmaToolInstallation> sigmaToolInstallation = sigmaBuildContext.getSigmaToolInstallation();
         if (sigmaToolInstallation.isPresent()) {
             SigmaToolInstallation installation = sigmaToolInstallation.get();
-            listener.getLogger().println(String.format("Sigma tool installation found. '%s'", installation.getHome()));
+            listener.getLogger().println(String.format("Rapid Scan Static tool installation found. '%s'", installation.getHome()));
 
             installation.getExecutablePath(launcher, listener)
                 .ifPresent(commandLineBuilder::add);
