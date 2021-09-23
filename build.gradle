@@ -11,7 +11,7 @@ plugins {
 }
 
 group = 'org.jenkins-ci.plugins'
-version = "0.0.1-SNAPSHOT"
+version = "2021.10.0-SNAPSHOT"
 description = 'Allows users to run Synopsys Rapid Scan Static commands in their builds'
 
 jenkinsPlugin {
