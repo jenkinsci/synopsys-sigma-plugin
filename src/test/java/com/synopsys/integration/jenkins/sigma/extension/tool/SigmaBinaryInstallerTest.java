@@ -135,7 +135,7 @@ public class SigmaBinaryInstallerTest {
             installer.performInstallation(toolInstallation, node, log);
             fail("Installer didn't throw abort exception when channel is expected to be null.");
         } catch (AbortException ex) {
-            assertEquals("Failed to install Sigma on Node sigma-test-node from downloadUrl.", ex.getMessage());
+            assertEquals("Failed to install Rapid Scan Static on Node sigma-test-node from downloadUrl.", ex.getMessage());
         }
     }
 }

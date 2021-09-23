@@ -40,7 +40,7 @@ import hudson.util.ListBoxModel;
 import jenkins.tasks.SimpleBuildStep;
 
 public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
-    public static final String FAILURE_MESSAGE = "Unable to perform Synopsys Sigma static analysis: ";
+    public static final String FAILURE_MESSAGE = "Unable to perform Synopsys Rapid Scan Static static analysis: ";
 
     private String sigmaToolName;
     private String commandLine;
@@ -80,7 +80,7 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
 
     @Override
     public void perform(Run<?, ?> run, FilePath workspace, EnvVars environment, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
-        listener.getLogger().println("Executing Sigma binary Build Step.");
+        listener.getLogger().println("Executing Rapid Scan Static binary Build Step.");
         try {
             if (Result.ABORTED.equals(run.getResult())) {
                 throw new AbortException(FAILURE_MESSAGE + "The build was aborted.");
@@ -88,7 +88,7 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
             Optional<SigmaToolInstallation> sigmaToolInstallation = getSigma(workspace.toComputer().getNode(), environment, listener);
             execute(run, workspace, environment, launcher, listener, sigmaToolInstallation.orElse(null));
         } catch (final InterruptedException e) {
-            listener.error("[ERROR] Synopsys Sigma thread was interrupted.", e);
+            listener.error("[ERROR] Synopsys Rapid Scan Static thread was interrupted.", e);
             run.setResult(Result.ABORTED);
             Thread.currentThread().interrupt();
         } catch (final Exception ex) {
@@ -100,7 +100,7 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
 
     @Override
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
-        listener.getLogger().println("Executing Sigma binary Build Step.");
+        listener.getLogger().println("Executing Rapid Scan Static binary Build Step.");
         try {
             if (Result.ABORTED.equals(build.getResult())) {
                 throw new AbortException(FAILURE_MESSAGE + "The build was aborted.");
@@ -113,7 +113,7 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
             Optional<SigmaToolInstallation> sigmaToolInstallation = getSigma(node, environment, listener);
             return execute(build, workingDirectory, environment, launcher, listener, sigmaToolInstallation.orElse(null));
         } catch (final InterruptedException e) {
-            listener.error("[ERROR] Synopsys Sigma thread was interrupted.", e);
+            listener.error("[ERROR] Synopsys Rapid Scan Static thread was interrupted.", e);
             build.setResult(Result.ABORTED);
             Thread.currentThread().interrupt();
         } catch (final Exception ex) {

@@ -21,7 +21,7 @@ import jenkins.security.MasterToSlaveCallable;
 public class FileDownloadInstaller extends MasterToSlaveCallable<Void, IOException> {
     public static final String INSTALLED_FROM_FILE_NAME = ".installedFrom";
     public static final String TIMESTAMP_FILE_NAME = ".timestamp";
-    private static final String LOG_PREFIX = "Sigma installation: ";
+    private static final String LOG_PREFIX = "Rapid Scan Static installation: ";
     private final String downloadUrl;
     private final FilePath downloadLocation;
     private final int timeoutInMilliseconds;
@@ -49,7 +49,7 @@ public class FileDownloadInstaller extends MasterToSlaveCallable<Void, IOExcepti
             downloadLocation.mkdirs();
             FilePath binaryPath = downloadLocation.child("sigma");
             File fileToWrite = new File(binaryPath.getRemote());
-            log.getLogger().println(LOG_PREFIX + "Installing Sigma binary...");
+            log.getLogger().println(LOG_PREFIX + "Installing Rapid Scan Static binary...");
             URLConnection binaryHostConnection = ProxyConfiguration.open(binarySourceUrl);
             binaryHostConnection.setConnectTimeout(timeoutInMilliseconds);
             binaryHostConnection.connect();

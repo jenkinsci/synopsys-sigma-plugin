@@ -63,11 +63,11 @@ public class SigmaBinaryInstaller extends ToolInstaller {
     @Override
     public FilePath performInstallation(ToolInstallation tool, Node node, TaskListener log) throws AbortException {
         FilePath installLocation = preferredLocation(tool, node);
-        String errorMessage = String.format("Failed to install Sigma on Node %s from %s.", node.getDisplayName(), downloadUrl);
+        String errorMessage = String.format("Failed to install Rapid Scan Static on Node %s from %s.", node.getDisplayName(), downloadUrl);
         try {
             final VirtualChannel virtualChannel = node.getChannel();
             if (virtualChannel == null) {
-                throw new AbortException("Configured node \"" + node.getDisplayName() + "\" is either not connected or offline.  Cannot install Sigma.");
+                throw new AbortException("Configured node \"" + node.getDisplayName() + "\" is either not connected or offline.  Cannot install Rapid Scan Static.");
             }
             // timeout is in seconds convert to milliseconds.
             int timeoutInMilliseconds = timeout * 1000;
