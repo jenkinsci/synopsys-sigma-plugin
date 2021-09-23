@@ -28,7 +28,7 @@ upload_unreleased_to_artifactory:
   variables: *jfrog_variables
   before_script: *jfrog_before_script
   script:
-    - VERSION=$(grep '^version = "' build.gradle  | sed -E 's/version = "([0-9]+([.][0-9]+)([.][0-9]+)([.]*[0-9]*)*-SNAPSHOT)"/\1/'
+    - VERSION=$(grep '^version = "' build.gradle  | sed -E 's/version = "([0-9]+([.][0-9]+)([.][0-9]+)([.]*[0-9]*)*-SNAPSHOT)"/\1/)'
     - ./jfrog rt upload --server-id sig-artifactory --fail-no-op "build/libs/synopsys-sigma*.hpi" synopsys-sigma-jenkins-local/unreleased/${VERSION}/
     - ./jfrog rt upload --server-id sig-artifactory --fail-no-op "build/libs/synopsys-sigma*.hpi" synopsys-sigma-jenkins-local/unreleased/latest/
   rules:
