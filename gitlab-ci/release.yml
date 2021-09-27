@@ -47,7 +47,7 @@ upload_released_to_artifactory:
   before_script: *jfrog_before_script
   script:
     # at release time, "-SNAPSHOT" will be removed from the build.gradle file
-    - VERSION=$(grep '^version = "' build.gradle  | sed -E 's/version = "([0-9](.[0-9])*-SNAPSHOT)"/\1/')
+    - VERSION=$(grep '^version = "' build.gradle  | sed -E 's/version = "(([0-9]+([.][0-9]+)+))"/\1/')
     - ./jfrog rt upload --server-id sig-artifactory --fail-no-op "build/libs/synopsys-sigma*.hpi" synopsys-sigma-jenkins-local/released/${VERSION}/
     - ./jfrog rt upload --server-id sig-artifactory --fail-no-op "build/libs/synopsys-sigma*.hpi" synopsys-sigma-jenkins-local/released/latest/
   rules:
