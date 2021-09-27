@@ -14,7 +14,7 @@ RELEASED versions can be found at [synopsys-sigma-jenkins-local/released/](http:
 
 All documentation for Synopsys Rapid Scan Static for Jenkins can be found on [confluence](https://sig-confluence.internal.synopsys.com/display/SIGMA/Jenkins+Plugin)
 
-## Release Steps ##
+# Release Steps #
 <ol>
 <li>Cut a release branch for the version that we want to release</li>
 <li>In the build.gradle file of the new release branch, remove the "-SNAPSHOT" from the version number and commit</li>
