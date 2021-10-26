@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 import com.synopsys.integration.jenkins.sigma.Messages;
 
@@ -26,6 +27,7 @@ import hudson.tools.ToolInstallation;
 import hudson.tools.ToolInstaller;
 import hudson.tools.ToolInstallerDescriptor;
 import hudson.util.FormValidation;
+import jenkins.model.Jenkins;
 
 public class SigmaBinaryInstaller extends ToolInstaller {
     public static final int DEFAULT_TIMEOUT_SECONDS = 30;
@@ -94,7 +96,9 @@ public class SigmaBinaryInstaller extends ToolInstaller {
             return toolType == SigmaToolInstallation.class;
         }
 
+        @POST
         public FormValidation doCheckDownloadUrl(@QueryParameter String value) throws IOException, ServletException {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             try {
                 if (StringUtils.isBlank(value)) {
                     return FormValidation.error(Messages.installer_error_downloadurl_empty());

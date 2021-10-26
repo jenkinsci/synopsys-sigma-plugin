@@ -62,63 +62,6 @@ public class SigmaBinaryStepTest {
     }
 
     @Test
-    public void testPreviousBuildResult() throws IOException, InterruptedException {
-        SigmaBinaryStep step = new SigmaBinaryStep();
-        SigmaToolInstallation toolInstallation = new SigmaToolInstallation("sigma-test", "home", Collections.emptyList());
-        step.setSigmaToolName("sigma-test");
-        step.setIgnorePolicies(false);
-        step.setCommandLine("analyze");
-        step.getDescriptor().setInstallations(toolInstallation);
-        AbstractBuild<?, ?> build = Mockito.mock(AbstractBuild.class);
-        Launcher launcher = null;
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        BuildListener buildListener = new StreamBuildListener(byteArrayOutputStream);
-        Mockito.when(build.getResult()).thenReturn(Result.ABORTED);
-
-        boolean result = step.perform(build, launcher, buildListener);
-        assertFalse(result);
-    }
-
-    @Test
-    public void testNodeMissing() throws IOException, InterruptedException {
-        SigmaBinaryStep step = new SigmaBinaryStep();
-        SigmaToolInstallation toolInstallation = new SigmaToolInstallation("sigma-test", "home", Collections.emptyList());
-        step.setSigmaToolName("sigma-test");
-        step.setIgnorePolicies(false);
-        step.setCommandLine("analyze");
-        step.getDescriptor().setInstallations(toolInstallation);
-        AbstractBuild<?, ?> build = Mockito.mock(AbstractBuild.class);
-        Launcher launcher = null;
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        BuildListener buildListener = new StreamBuildListener(byteArrayOutputStream);
-
-        boolean result = step.perform(build, launcher, buildListener);
-        assertNull(build.getBuiltOn());
-        assertFalse(result);
-    }
-
-    @Test
-    public void testChannelMissing() throws IOException, InterruptedException {
-        SigmaBinaryStep step = new SigmaBinaryStep();
-        SigmaToolInstallation toolInstallation = new SigmaToolInstallation("sigma-test", "home", Collections.emptyList());
-        step.setSigmaToolName("sigma-test");
-        step.setIgnorePolicies(false);
-        step.setCommandLine("analyze");
-        step.getDescriptor().setInstallations(toolInstallation);
-        AbstractBuild<?, ?> build = Mockito.mock(AbstractBuild.class);
-        Node node = Mockito.mock(Node.class);
-        Mockito.when(build.getBuiltOn()).thenReturn(node);
-
-        Launcher launcher = null;
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        BuildListener buildListener = new StreamBuildListener(byteArrayOutputStream);
-
-        boolean result = step.perform(build, launcher, buildListener);
-        assertNull(build.getBuiltOn().getChannel());
-        assertFalse(result);
-    }
-
-    @Test
     public void testPipelinePreviousBuildResult() throws IOException, InterruptedException {
         SigmaBinaryStep step = new SigmaBinaryStep();
         SigmaToolInstallation toolInstallation = new SigmaToolInstallation("sigma-test", "home", Collections.emptyList());

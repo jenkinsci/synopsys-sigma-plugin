@@ -98,32 +98,6 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
         }
     }
 
-    @Override
-    public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
-        listener.getLogger().println("Executing Rapid Scan Static binary Build Step.");
-        try {
-            if (Result.ABORTED.equals(build.getResult())) {
-                throw new AbortException(FAILURE_MESSAGE + "The build was aborted.");
-            }
-            Node node = Optional.ofNullable(build.getBuiltOn()).orElseThrow(() -> new AbortException(FAILURE_MESSAGE + "Could not access node."));
-            VirtualChannel virtualChannel = Optional.ofNullable(node.getChannel()).orElseThrow(() -> new AbortException(FAILURE_MESSAGE + "Configured node \"" + node.getDisplayName() + "\" is either not connected or offline."));
-
-            FilePath workingDirectory = getWorkingDirectory(build, virtualChannel);
-            EnvVars environment = build.getEnvironment(listener);
-            Optional<SigmaToolInstallation> sigmaToolInstallation = getSigma(node, environment, listener);
-            return execute(build, workingDirectory, environment, launcher, listener, sigmaToolInstallation.orElse(null));
-        } catch (final InterruptedException e) {
-            listener.error("[ERROR] Synopsys Rapid Scan Static thread was interrupted.", e);
-            build.setResult(Result.ABORTED);
-            Thread.currentThread().interrupt();
-        } catch (final Exception ex) {
-            listener.error("[ERROR] " + ex.getMessage());
-            ex.printStackTrace(listener.fatalError(FAILURE_MESSAGE + "sigma command execution failed."));
-            build.setResult(Result.UNSTABLE);
-        }
-        return false;
-    }
-
     private boolean execute(Run<?, ?> run, FilePath workingDirectory, EnvVars environment, Launcher launcher, TaskListener listener, SigmaToolInstallation sigmaToolInstallation) throws IOException, InterruptedException {
         SigmaBuildContext sigmaBuildContext = createBuildContext(environment, launcher, listener, sigmaToolInstallation);
         CommandLineBuilder commandLineBuilder = new CommandLineBuilder(sigmaBuildContext, ignorePolicies, commandLine);
@@ -136,20 +110,6 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
 
     private SigmaBuildContext createBuildContext(EnvVars environment, Launcher launcher, TaskListener listener, SigmaToolInstallation sigmaToolInstallation) throws IOException, InterruptedException {
         return new SigmaBuildContext(launcher, listener, environment, sigmaToolInstallation);
-    }
-
-    private FilePath getWorkingDirectory(final AbstractBuild<?, ?> build, VirtualChannel virtualChannel) throws AbortException {
-        FilePath workingDirectory;
-        if (build.getWorkspace() == null) {
-            if (virtualChannel != null) {
-                workingDirectory = new FilePath(virtualChannel, build.getProject().getCustomWorkspace());
-            } else {
-                throw new AbortException(FAILURE_MESSAGE + "Could not determine working directory");
-            }
-        } else {
-            workingDirectory = build.getWorkspace();
-        }
-        return workingDirectory;
     }
 
     private Result executeSigma(SigmaBuildContext sigmaBuildContext, ArgumentListBuilder commandLineBuilder, FilePath workingDirectory) throws IOException, InterruptedException {
