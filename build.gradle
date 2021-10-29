@@ -11,17 +11,26 @@ plugins {
     id 'org.jenkins-ci.jpi' version '0.43.0'
 }
 
-group = 'org.jenkins-ci.plugins'
+group = 'io.jenkins.plugins'
 version = "2021.11.0-SNAPSHOT"
 description = 'Allows users to run Synopsys Rapid Scan Static commands in their builds'
 
 jenkinsPlugin {
     jenkinsVersion = '2.263.1'
     displayName = 'Synopsys Rapid Scan Static Plugin'
+    shortName = "synopsys-sigma-plugin"
     //url = 'https://wiki.jenkins.io/display/JENKINS/Synopsys+Coverity+Plugin'
     //gitHubUrl = 'https://github.com/jenkinsci/synopsys-coverity-plugin'
 
     pluginFirstClassLoader = false
+
+    licenses {
+        license {
+            name = 'MIT License'
+            distribution = 'repo'
+            url = 'https://opensource.org/licenses/MIT'
+        }
+    }
 }
 
 dependencies {
