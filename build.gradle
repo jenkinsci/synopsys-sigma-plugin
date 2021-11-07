@@ -18,7 +18,7 @@ description = 'Allows users to run Synopsys Rapid Scan Static commands in their 
 jenkinsPlugin {
     jenkinsVersion = '2.263.1'
     displayName = 'Synopsys Rapid Scan Static Plugin'
-    shortName = "synopsys-sigma-plugin"
+    shortName = "synopsys-sigma"
     //url = 'https://wiki.jenkins.io/display/JENKINS/Synopsys+Coverity+Plugin'
     //gitHubUrl = 'https://github.com/jenkinsci/synopsys-coverity-plugin'
 
