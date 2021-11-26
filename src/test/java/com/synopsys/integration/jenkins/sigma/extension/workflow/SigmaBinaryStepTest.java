@@ -55,7 +55,7 @@ public class SigmaBinaryStepTest {
         SigmaBinaryStep.DescriptorImpl descriptor = new SigmaBinaryStep.DescriptorImpl();
         SigmaToolInstallation toolInstallation = new SigmaToolInstallation("sigma-test", "home", Collections.emptyList());
         descriptor.setInstallations(toolInstallation);
-        ListBoxModel toolOptions = descriptor.doFillSigmaToolNameItems();
+        ListBoxModel toolOptions = descriptor.doFillSigmaToolNameItems(null);
         assertFalse(toolOptions.isEmpty());
         assertTrue(descriptor.hasToolsConfigured());
         assertEquals(toolInstallation.getDescriptor(), descriptor.getToolDescriptor());

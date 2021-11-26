@@ -11,6 +11,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 
 import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
@@ -27,6 +28,7 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Item;
 import hudson.model.Node;
 import hudson.model.Result;
 import hudson.model.Run;
@@ -37,6 +39,7 @@ import hudson.tasks.Builder;
 import hudson.tools.ToolInstallation;
 import hudson.util.ArgumentListBuilder;
 import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 
 public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
@@ -197,10 +200,13 @@ public class SigmaBinaryStep extends Builder implements SimpleBuildStep {
         }
 
         @SuppressWarnings("unused")
-        public ListBoxModel doFillSigmaToolNameItems() {
+        public ListBoxModel doFillSigmaToolNameItems(@AncestorInPath Item item) {
             ListBoxModel items = new ListBoxModel();
-            for (SigmaToolInstallation installation : installations) {
-                items.add(installation.getName());
+            if (item == null && Jenkins.get().hasPermission(Jenkins.ADMINISTER)
+                    || item != null && item.hasPermission(Item.CONFIGURE)) {
+                for (SigmaToolInstallation installation : installations) {
+                    items.add(installation.getName());
+                }
             }
 
             return items;
