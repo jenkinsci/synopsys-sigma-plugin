@@ -28,3 +28,8 @@ jobs:
       run: bash ./gradlew build --stacktrace --parallel -i
     - name: Test with Gradle
       run: bash ./gradlew test --stacktrace --parallel -i
+    - name: HPI file artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: synopsys-sigma-plugin
+        path: build/libs/synopsys-sigma-*.hpi
