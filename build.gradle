@@ -12,15 +12,14 @@ plugins {
 }
 
 group = 'io.jenkins.plugins'
-version = "2021.11.0-SNAPSHOT"
+version = "2021.12.0-SNAPSHOT"
 description = 'Allows users to run Synopsys Rapid Scan Static commands in their builds'
 
 jenkinsPlugin {
     jenkinsVersion = '2.263.1'
     displayName = 'Synopsys Rapid Scan Static Plugin'
     shortName = "synopsys-sigma"
-    //url = 'https://wiki.jenkins.io/display/JENKINS/Synopsys+Coverity+Plugin'
-    //gitHubUrl = 'https://github.com/jenkinsci/synopsys-coverity-plugin'
+    url = 'https://github.com/jenkinsci/synopsys-sigma-plugin'
 
     pluginFirstClassLoader = false
 
