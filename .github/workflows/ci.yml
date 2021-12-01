@@ -31,5 +31,5 @@ jobs:
     - name: HPI file artifact
       uses: actions/upload-artifact@v2
       with:
-        name: synopsys-sigma-plugin
+        name: synopsys-sigma-plugin.hpi
         path: build/libs/synopsys-sigma-*.hpi
