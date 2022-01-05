@@ -47,7 +47,11 @@ public class FileDownloadInstaller extends MasterToSlaveCallable<Void, IOExcepti
                 return null;
             }
             downloadLocation.mkdirs();
-            FilePath binaryPath = downloadLocation.child("sigma");
+            String binaryName = "sigma";
+            if (Functions.isWindows()) {
+                binaryName += ".exe";
+            }
+            FilePath binaryPath = downloadLocation.child(binaryName);
             File fileToWrite = new File(binaryPath.getRemote());
             log.getLogger().println(LOG_PREFIX + "Installing Rapid Scan Static binary...");
             URLConnection binaryHostConnection = ProxyConfiguration.open(binarySourceUrl);

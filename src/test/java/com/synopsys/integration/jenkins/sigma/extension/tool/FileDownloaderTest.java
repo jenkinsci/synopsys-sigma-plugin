@@ -17,6 +17,7 @@ import org.junit.Test;
 import com.synopsys.integration.jenkins.sigma.utils.SigmaTestUtil;
 
 import hudson.FilePath;
+import hudson.Functions;
 import hudson.model.TaskListener;
 import hudson.util.StreamTaskListener;
 
@@ -52,7 +53,11 @@ public class FileDownloaderTest {
         FileDownloadInstaller installer = new FileDownloadInstaller(downloadUrl, downloadLocation, timeout, log, updateCheck);
         installer.call();
         assertTrue(downloadLocation.exists());
-        assertTrue(downloadLocation.child("sigma").exists());
+        String binaryName = "sigma";
+        if (Functions.isWindows()) {
+            binaryName += ".exe";
+        }
+        assertTrue(downloadLocation.child(binaryName).exists());
     }
 
     @Test
