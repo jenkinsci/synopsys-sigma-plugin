@@ -50,7 +50,7 @@ public class BinaryUpdateCheckTest {
         timestampPath.touch(System.currentTimeMillis());
 
         BinaryUpdateCheck updateCheck = new BinaryUpdateCheck(binaryUrlString, 1);
-        assertTrue(updateCheck.isUpToDate(installedFrom, timestampPath));
+        assertTrue(updateCheck.isUpToDate(installedFrom, timestampPath, filePathToCheck));
     }
 
     @Test
@@ -65,7 +65,7 @@ public class BinaryUpdateCheckTest {
         timestampPath.touch(System.currentTimeMillis());
 
         BinaryUpdateCheck updateCheck = new BinaryUpdateCheck(binaryUrlString, 1);
-        assertTrue(updateCheck.isUpToDate(installedFrom, timestampPath));
+        assertTrue(updateCheck.isUpToDate(installedFrom, timestampPath, filePathToCheck));
     }
 
     @Test
@@ -80,7 +80,7 @@ public class BinaryUpdateCheckTest {
         timestampPath.touch(System.currentTimeMillis());
 
         BinaryUpdateCheck updateCheck = new BinaryUpdateCheck(binaryUrlString, 1);
-        assertFalse(updateCheck.isUpToDate(installedFrom, timestampPath));
+        assertFalse(updateCheck.isUpToDate(installedFrom, timestampPath, filePathToCheck));
     }
 
     @Test
@@ -96,6 +96,22 @@ public class BinaryUpdateCheckTest {
         timestampPath.touch(System.currentTimeMillis() - 10000);
 
         BinaryUpdateCheck updateCheck = new BinaryUpdateCheck(binaryUrlString, 1);
-        assertFalse(updateCheck.isUpToDate(installedFrom, timestampPath));
+        assertFalse(updateCheck.isUpToDate(installedFrom, timestampPath, filePathToCheck));
+    }
+
+    @Test
+    public void testBinaryNonexistent() throws IOException, InterruptedException {
+        FilePath homeFilePath = new FilePath(homeDirectory);
+        FilePath filePathToCheck = new FilePath(fileToCheck);
+        URL binaryUrl = filePathToCheck.toURI().toURL();
+        String binaryUrlString = binaryUrl.toString();
+        FilePath installedFrom = homeFilePath.child(FileDownloadInstaller.INSTALLED_FROM_FILE_NAME);
+        FilePath timestampPath = homeFilePath.child(FileDownloadInstaller.TIMESTAMP_FILE_NAME);
+        installedFrom.write(binaryUrlString, StandardCharsets.UTF_8.name());
+        timestampPath.touch(System.currentTimeMillis());
+        FilePath otherBinayFile = homeFilePath.child("a_different_sigma_binary");
+
+        BinaryUpdateCheck updateCheck = new BinaryUpdateCheck(binaryUrlString, 1);
+        assertFalse(updateCheck.isUpToDate(installedFrom, timestampPath, otherBinayFile));
     }
 }

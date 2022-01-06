@@ -46,18 +46,15 @@ public class FileDownloaderTest {
         TaskListener log = new StreamTaskListener(byteArrayOutputStream);
         BinaryUpdateCheck updateCheck = new BinaryUpdateCheck(downloadUrl, timeout) {
             @Override
-            public boolean isUpToDate(final FilePath installedFrom, final FilePath timestampPath) throws IOException, InterruptedException {
+            public boolean isUpToDate(final FilePath installedFrom, final FilePath timestampPath, FilePath binaryPath) throws IOException, InterruptedException {
                 return false;
             }
         };
         FileDownloadInstaller installer = new FileDownloadInstaller(downloadUrl, downloadLocation, timeout, log, updateCheck);
         installer.call();
         assertTrue(downloadLocation.exists());
-        String binaryName = "sigma";
-        if (Functions.isWindows()) {
-            binaryName += ".exe";
-        }
-        assertTrue(downloadLocation.child(binaryName).exists());
+        String binaryFileName = Functions.isWindows() ? SigmaToolInstallation.WINDOWS_SIGMA_COMMAND : SigmaToolInstallation.UNIX_SIGMA_COMMAND;
+        assertTrue(downloadLocation.child(binaryFileName).exists());
     }
 
     @Test
@@ -68,7 +65,7 @@ public class FileDownloaderTest {
         TaskListener log = new StreamTaskListener(byteArrayOutputStream);
         BinaryUpdateCheck updateCheck = new BinaryUpdateCheck(downloadUrl, 0) {
             @Override
-            public boolean isUpToDate(final FilePath installedFrom, final FilePath timestampPath) {
+            public boolean isUpToDate(final FilePath installedFrom, final FilePath timestampPath, FilePath binaryPath) {
                 return true;
             }
         };
@@ -85,7 +82,7 @@ public class FileDownloaderTest {
         TaskListener log = new StreamTaskListener(byteArrayOutputStream);
         BinaryUpdateCheck updateCheck = new BinaryUpdateCheck(downloadUrl, 1) {
             @Override
-            public boolean isUpToDate(final FilePath installedFrom, final FilePath timestampPath) throws IOException {
+            public boolean isUpToDate(final FilePath installedFrom, final FilePath timestampPath, FilePath binaryPath) throws IOException {
                 throw new IOException("Test I/O exception");
             }
         };

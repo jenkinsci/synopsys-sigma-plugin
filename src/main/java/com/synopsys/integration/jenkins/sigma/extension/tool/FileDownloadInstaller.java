@@ -42,16 +42,13 @@ public class FileDownloadInstaller extends MasterToSlaveCallable<Void, IOExcepti
             URL binarySourceUrl = new URL(downloadUrl);
             FilePath installedFrom = downloadLocation.child(INSTALLED_FROM_FILE_NAME);
             FilePath timestampPath = downloadLocation.child(TIMESTAMP_FILE_NAME);
-            if (binaryUpdateCheck.isUpToDate(installedFrom, timestampPath)) {
+            String binaryFileName = Functions.isWindows() ? SigmaToolInstallation.WINDOWS_SIGMA_COMMAND : SigmaToolInstallation.UNIX_SIGMA_COMMAND;
+            FilePath binaryPath = downloadLocation.child(binaryFileName);
+            if (binaryUpdateCheck.isUpToDate(installedFrom, timestampPath, binaryPath)) {
                 log.getLogger().println(LOG_PREFIX + "Skipping tool installation already up to date on node.");
                 return null;
             }
             downloadLocation.mkdirs();
-            String binaryName = "sigma";
-            if (Functions.isWindows()) {
-                binaryName += ".exe";
-            }
-            FilePath binaryPath = downloadLocation.child(binaryName);
             File fileToWrite = new File(binaryPath.getRemote());
             log.getLogger().println(LOG_PREFIX + "Installing Rapid Scan Static binary...");
             URLConnection binaryHostConnection = ProxyConfiguration.open(binarySourceUrl);

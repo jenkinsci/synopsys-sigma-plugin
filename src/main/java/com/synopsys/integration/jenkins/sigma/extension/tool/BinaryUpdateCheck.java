@@ -21,10 +21,13 @@ public class BinaryUpdateCheck implements Serializable {
         this.timeoutInMilliseconds = timeoutInMilliseconds;
     }
 
-    public boolean isUpToDate(FilePath installedFrom, FilePath timestampPath) throws IOException, InterruptedException {
+    public boolean isUpToDate(FilePath installedFrom, FilePath timestampPath, FilePath binaryPath) throws IOException, InterruptedException {
         boolean sameInstalledFromURL = installedFrom.exists() && installedFrom.readToString().equals(downloadUrl);
         boolean notModifiedSinceInstalled = !hasModifiedSinceInstalled(timestampPath);
-        return sameInstalledFromURL && notModifiedSinceInstalled;
+        // SIGMA-3269: Added check for binaryPathExists because windows might have a "sigma" binary installed,
+        // not a "sigma.exe" binary because of the bug in SIGMA-3269. So we need to download the binary as "sigma.exe".
+        boolean binaryPathExists = binaryPath.exists();
+        return sameInstalledFromURL && notModifiedSinceInstalled && binaryPathExists;
     }
 
     public boolean hasModifiedSinceInstalled(FilePath timestampFilePath) throws IOException, InterruptedException {
