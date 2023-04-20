@@ -8,4 +8,4 @@ Synopsys Rapid Scan Static for Jenkins simplifies running Synopsys Rapid Scan St
 
 # Documentation #
 
-All documentation for the Synopsys Rapid Scan Static Jenkins Plugin can be found at: https://community.synopsys.com/s/document-item?bundleId=sigma-ug&topicId=topics%2Fjenkins-plugin%2Fcreating_a_jenkins_plugin.html&_LANG=enus
+All documentation for the Synopsys Rapid Scan Static Jenkins Plugin can be found at: https://sig-product-docs.synopsys.com/bundle/sigma-ug/page/topics/jenkins-plugin/creating_a_jenkins_plugin.html
