@@ -1,11 +1,7 @@
-<!--- Copyright (c) 2022 Synopsys, Inc. All rights reserved worldwide. --->
-[![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins%2Fsynopsys-sigma-plugin%2Fmaster)](https://ci.jenkins.io/job/Plugins/job/synopsys-sigma-plugin/job/master/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<!--- Copyright (c) 2024 Synopsys, Inc. All rights reserved worldwide. --->
 
-# Overview #
+# DEPRECATED #
 
-Synopsys Rapid Scan Static for Jenkins simplifies running Synopsys Rapid Scan Static commands in Jenkins builds.
+As part of a rebranding effort, the Synospys Rapid Scan Static plugin is obsolete and deprecated. Please now use the Black Duck Rapid Scan Static Jenkins plugin found at: https://github.com/jenkinsci/black-duck-sigma-plugin.
 
-# Documentation #
-
-All documentation for the Synopsys Rapid Scan Static Jenkins Plugin can be found at: https://sig-product-docs.synopsys.com/bundle/sigma-ug/page/topics/jenkins-plugin/creating_a_jenkins_plugin.html
+See documentation for the new Black Duck Rapid Scan Static Jenkins plugin found at: https://documentation.blackduck.com/bundle/sigma-ug/page/topics/jenkins-plugin/creating_a_jenkins_plugin.html
